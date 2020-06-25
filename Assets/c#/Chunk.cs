@@ -14,6 +14,7 @@ public class Chunk {
 	Block[] _allBlocks;
 	Vector3 _position;
 	Mesh _mesh;
+	GameObject _collider;
 	public Chunk(Vector3 chunkPos){
 		int nrOfCubes = (int)(Chunk._size.x * Chunk._size.y * Chunk._size.z);
 		_mesh = new Mesh();
@@ -27,6 +28,7 @@ public class Chunk {
 		BlockFactory bFactory = BlockFactory.Instance;
 		Vector3 bSize = Block._size;
 		_allBlocks = new Block[(int)(_size.x * _size.y * _size.z)];
+
 
 
 		int index = 0;
@@ -53,6 +55,10 @@ public class Chunk {
 		_mesh.uv = uvs;
 		_mesh.triangles = tris.ToArray();
 		_mesh.normals = normals;
+		_collider = new GameObject();
+		_collider.transform.position = _position;
+		_collider.AddComponent<MeshCollider>();
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 	}
 	public void SetChunkPos(Vector3 position){
 		_position = position;

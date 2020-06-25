@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class ControllerTest : MonoBehaviour {
-	private enum BoxSides
+	/*private enum BoxSides
 	{
 		LEFT =0,
 		RIGHT,
@@ -12,12 +12,43 @@ public class ControllerTest : MonoBehaviour {
 		TOP,
 		BOTTOM
 
+	};*/
+	private enum BoxSides
+	{
+		FTL=0,
+		FT,
+		FTR,
+		FL,
+		F,
+		FR,
+		FBL,
+		FB,
+		FBR,
+		BTL,
+		BT,
+		BTR,
+		BL,
+		BOT,
+		BR,
+		BBL,
+		BB,
+		BBR,
+		TL,
+		T,
+		TR,
+		R,
+		RB,
+		BACK,
+		LB,
+		L,
+		END
+		
 	};
 	public GameObject _boxTemplate;
 	World _world;
 	BBox _botBox;
 	GameObject _camera;
-	BBox[] _collisionBoxes;
+	//BBox[] _collisionBoxes;
 
 	bool _changedBlock = false;
 	int _cBlockId;
@@ -30,7 +61,7 @@ public class ControllerTest : MonoBehaviour {
 
 		//GameObject box = GameObject.Instantiate (_boxTemplate);
 		//_botBox = new BBox (box);
-		_collisionBoxes = new BBox[6];
+		/*_collisionBoxes = new BBox[(int)(BoxSides.END)];
 		for (int i = 0; i < _collisionBoxes.Length; i++) {
 			_collisionBoxes [i] = new BBox (GameObject.Instantiate (_boxTemplate));
 		}
@@ -39,7 +70,7 @@ public class ControllerTest : MonoBehaviour {
 		_collisionBoxes [(int)BoxSides.FORWARD].SetPosition (transform.position + new Vector3 (0, 0, Block._size.z));
 		_collisionBoxes [(int)BoxSides.BACK].SetPosition (transform.position + new Vector3 (0, 0, -Block._size.z));
 		_collisionBoxes [(int)BoxSides.LEFT].SetPosition (transform.position + new Vector3 (-Block._size.x, 0, 0));
-		_collisionBoxes [(int)BoxSides.RIGHT].SetPosition (transform.position + new Vector3 (Block._size.x, 0, 0));
+		_collisionBoxes [(int)BoxSides.RIGHT].SetPosition (transform.position + new Vector3 (Block._size.x, 0, 0));*/
 		//_botBox.SetPosition (transform.position + new Vector3 (0, -Block._size.y, 0));
 
 	}
@@ -50,7 +81,7 @@ public class ControllerTest : MonoBehaviour {
 			return;
 		HandleInput ();
 		CheckBlockChange ();
-		for(int i =0; i < _collisionBoxes.Length; i++){
+		/*for(int i =0; i < _collisionBoxes.Length; i++){
 			Block b = _world.ChunkCtrl.GetNeighbor ((BlockSide )i, transform.position );
 			if(_changedBlock){
 				if(b!= null)
@@ -58,7 +89,7 @@ public class ControllerTest : MonoBehaviour {
 			}
 			if(b!=null)
 				_collisionBoxes[i].Update (transform.position, b);
-		}
+		}*/
 		/*Block b = _world.GetNeighbor (BlockSide.BOTTOM, transform.position);
 		if(_changedBlock){
 			_collisionBoxes[(int)BoxSides.BOTTOM].SetPosition(b.Position);

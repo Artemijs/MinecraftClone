@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// this file creates a quad mesh manually
+/// </summary>
 public class Quad : MonoBehaviour {
 	public Material _material;
 	Mesh _mesh;

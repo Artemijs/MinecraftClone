@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 
+/// <summary>
+/// this file was used in the 0.1 version where cubes were made up of plane objects
+/// </summary>
 public class Plane {
 	Mesh _mesh;
 	Vector3 _position;

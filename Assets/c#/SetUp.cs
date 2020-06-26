@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// setup of the v0.1, a version that used plain objects 
+/// </summary>
 public class SetUp : MonoBehaviour {
 	public GameObject[] _plains;
 	public Material[] _materials;

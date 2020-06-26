@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// this file tries to draw the meshes of plain objects manually, a transitionary period between versions
+/// </summary>
 public class MesTest : MonoBehaviour {
 	public GameObject _gomesh;
 	public Material _material;

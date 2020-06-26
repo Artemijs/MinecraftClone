@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// this file was used to check collision between player and the world :D
+/// </summary>
 public class BBox {
 	bool _locked;
 	Collider _boxCol;

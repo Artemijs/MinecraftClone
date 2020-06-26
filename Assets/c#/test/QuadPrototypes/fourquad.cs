@@ -2,6 +2,9 @@
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Rendering;
+/// <summary>
+/// this file makes a block mesh 
+/// </summary>
 public class fourquad : MonoBehaviour {
 	public Material _material;
 	Mesh _mesh;

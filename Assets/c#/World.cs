@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// basically main
+/// </summary>
 public class World : MonoBehaviour {
 	bool _ready = false;
 	// Use this for initialization

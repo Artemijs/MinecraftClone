@@ -55,9 +55,9 @@ public class ControllerTest : MonoBehaviour {
 
 	void Start () {
 		
-		_world = GameObject.Find ("World").GetComponent<World> ();
+		//_world = GameObject.Find ("World").GetComponent<World> ();
 		_camera = GameObject.Find ("Camera");
-		_world.ChunkCtrl.GetBlockId (transform.position);
+		//_world.ChunkCtrl.GetBlockId (transform.position);
 
 		//GameObject box = GameObject.Instantiate (_boxTemplate);
 		//_botBox = new BBox (box);
@@ -76,11 +76,11 @@ public class ControllerTest : MonoBehaviour {
 	}
 	// Update is called once per frame
 	void Update () {
-		if (!_world.Ready)
+		/*if (!_world.Ready)
 			
-			return;
+			return;*/
 		HandleInput ();
-		CheckBlockChange ();
+		//CheckBlockChange ();
 		/*for(int i =0; i < _collisionBoxes.Length; i++){
 			Block b = _world.ChunkCtrl.GetNeighbor ((BlockSide )i, transform.position );
 			if(_changedBlock){

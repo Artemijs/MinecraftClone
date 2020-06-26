@@ -38,20 +38,22 @@ public class Chunk {
 			for (int y = 0; y < _size.y; y++)
 			{
 				for (int z = 0; z < _size.z; z++)
-				{
-					_allBlocks[index] = new Block(new Vector3(x * bSize.x, y * bSize.y, z * bSize.z) + chunkPos);
-					//set type and pos of every block
-					bool[] nBools = bFactory.SetBlockType(ref _allBlocks[index]);
-					if (nBools != null) {
-						_boolMap[index] = (nBools != null);
-						nrOfVisibleBlocks++;
-					}
-					_temp.Add(index, new Vector3(x, y, z));
+				{//legacy stuff :D
+				 /*_allBlocks[index] = new Block(new Vector3(x * bSize.x, y * bSize.y, z * bSize.z) + chunkPos);
+				 //set type and pos of every block
+				 bool[] nBools = bFactory.SetBlockType(ref _allBlocks[index]);
+				 if (nBools != null) {
+					 _boolMap[index] = (nBools != null);
+					 nrOfVisibleBlocks++;
+				 }
+				 _temp.Add(index, new Vector3(x, y, z));*/
+					_boolMap[index] = (y ==2 && x !=1);
 					index++;
 				}
 			}
 		}
 		Vector3Int pos = new Vector3Int();
+		index = 0;
 		for (int x = 0; x < _size.x; x++)
 		{
 			for (int y = 0; y < _size.y; y++)
@@ -62,47 +64,69 @@ public class Chunk {
 					if (GetBoolFromPos(pos)){
 						//get neighbours 
 						bool[] bools = GetNeighbours(pos);
-						MakeCubeMesh(bools, pos, ref vertices, ref tris);
+						MakeCubeMesh(bools, pos, ref vertices, ref tris, ref uvs);
+						
+						index++;
 					}
 				}
 			}
 		}
 		_mesh.vertices = vertices.ToArray();
-		//_mesh.uv = uvs;
+		_mesh.uv = uvs.ToArray();
 		_mesh.triangles = tris.ToArray();
 		//_mesh.normals = normals;
 		_mesh.RecalculateNormals();
+		if (_collider == null)
+			_collider = new GameObject();
+		_collider.transform.position = _position;
+		_collider.AddComponent<MeshCollider>();
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+
 	}
-	void MakeCubeMesh(bool[] nbools, Vector3Int pos, ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs) {
-		if (nbools[0]){//left
-			MakeLeftPlane(ref verts, ref tris, ref uvs, pos);
+	void MakeCubeMesh(bool[] nbools, Vector3Int pos, ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs ) {
+		if (!nbools[0]){//left
+			MakeLeftPlane(ref verts, ref tris, pos);
+			AddUVSet(ref uvs);
 		}
-		if (nbools[1])
+		if (!nbools[1])
 		{//right
-			MakeRightPlane(ref verts, ref tris, ref uvs, pos);
+			MakeRightPlane(ref verts, ref tris, pos);
+			AddUVSet(ref uvs);
 		}
-		if (nbools[2])
+		if (!nbools[2])
 		{//forward
-			MakeForwardPlane(ref verts, ref tris, ref uvs, pos);
+			MakeForwardPlane(ref verts, ref tris, pos);
+			AddUVSet(ref uvs);
 		}
-		if (nbools[3])
+		if (!nbools[3])
 		{//back
-			MakeBackPlane(ref verts, ref tris, ref uvs, pos);
+			MakeBackPlane(ref verts, ref tris, pos);
+			AddUVSet(ref uvs);
 		}
-		if (nbools[4])
+		if (!nbools[4])
 		{//top
-			MakeTopPlane(ref verts, ref tris, ref uvs, pos);
+			MakeTopPlane(ref verts, ref tris, pos);
+			AddUVSet(ref uvs);
 		}
-		if (nbools[5])
+		if (!nbools[5])
 		{//bottom
-			MakeBotPlane(ref verts, ref tris, ref uvs, pos);
+			MakeBotPlane(ref verts, ref tris, pos);
+			AddUVSet(ref uvs);
 		}
 	}
-	void MakeTopPlane(ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs, Vector3Int pos) {
+	void AddUVSet(ref List<Vector2> uvs) {
+		uvs.AddRange(new Vector2[] {
+			new Vector2(0.0f, 0.0f),
+			new Vector2(1.0f, 0.0f),
+			new Vector2(0.0f, 1.0f),
+			new Vector2(1.0f, 1.0f)
+		});
+	}
+	void MakeTopPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos) {
 		float s = 0.5f;
 		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z - s));
-		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z - s));
 		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z + s));
+		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z - s));
 		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z + s));
 		int start = verts.Count - 4;
 		tris.AddRange(new int[]{
@@ -116,7 +140,7 @@ public class Chunk {
 				});
 		
 	}
-	void MakeLeftPlane(ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs, Vector3Int pos)
+	void MakeLeftPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -136,7 +160,7 @@ public class Chunk {
 				});
 
 	}
-	void MakeRightPlane(ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs, Vector3Int pos)
+	void MakeRightPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -156,7 +180,7 @@ public class Chunk {
 				});
 
 	}
-	void MakeBotPlane(ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs, Vector3Int pos)
+	void MakeBotPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -176,7 +200,7 @@ public class Chunk {
 				});
 
 	}
-	void MakeForwardPlane(ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs, Vector3Int pos)
+	void MakeForwardPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -196,7 +220,7 @@ public class Chunk {
 				});
 
 	}
-	void MakeBackPlane(ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs, Vector3Int pos)
+	void MakeBackPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -216,6 +240,21 @@ public class Chunk {
 				});
 
 	}
+	public void SetUvs(ref List<Vector2> uvs, Block b, int index)
+	{
+		/*
+		 _uvs[0] = new Vector2(0.0f, 0.0f);
+		_uvs[1] = new Vector2(1.0f, 0.0f);
+		_uvs[2] = new Vector2(0.0f, 1.0f);
+		_uvs[3] = new Vector2(1.0f, 1.0f);
+		 */
+		uvs.AddRange(new Vector2[] {
+			new Vector2(0.0f, 0.0f),
+			new Vector2(1.0f, 0.0f),
+			new Vector2(0.0f, 1.0f),
+			new Vector2(1.0f, 1.0f)
+		});
+	}
 	bool[] GetNeighbours(Vector3Int pos) {
 		int i = 0;
 		bool[] bools = new bool[6];
@@ -223,15 +262,15 @@ public class Chunk {
 		if (CheckOutOfBounds(nPos)) bools[i] = false;
 		else bools[i] = GetBoolFromPos(nPos);
 		i++;
-		nPos = pos + new Vector3Int(0, 0, 1);//right
+		nPos = pos + new Vector3Int(1, 0, 0);//right
 		if (CheckOutOfBounds(nPos)) bools[i] = false;
 		else bools[i] = GetBoolFromPos(nPos);
 		i++;
-		nPos = pos + new Vector3Int(0, 0, -1);//forward
+		nPos = pos + new Vector3Int(0, 0, 1);//forward
 		if (CheckOutOfBounds(nPos)) bools[i] = false;
 		else bools[i] = GetBoolFromPos(nPos);
 		i++;
-		nPos = pos + new Vector3Int(1, 0, 0);//back
+		nPos = pos + new Vector3Int(0, 0, -1);//back
 		if (CheckOutOfBounds(nPos)) bools[i] = false;
 		else bools[i] = GetBoolFromPos(nPos);
 		i++;

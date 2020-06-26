@@ -22,10 +22,7 @@ public class BlockFactory {
 	public void LoadMaterials(Material[] mats){
 		_materials = mats;
 	}
-	public void LoadPlains(GameObject[] plains){
-		_plainTemplates = plains;
-		_planeTemplate = _plainTemplates[0].GetComponent<MeshFilter> ().sharedMesh;
-	}
+	
 	public void Draw(Mesh m, Vector3 chunkpos){
 		//Material mat;
 		//Graphics.DrawMesh (m, Vector3.zero, Quaternion.identity, _materials[0], 0, null, 0, _mBlock, ShadowCastingMode.TwoSided);
@@ -40,6 +37,7 @@ public class BlockFactory {
 			return instance;
 		}
 	}
+
 	public bool[] SetBlockType(ref Block b){
 		
 		Vector3 pos = b.Position;

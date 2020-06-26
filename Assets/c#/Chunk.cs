@@ -1,7 +1,6 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System.Collections.Generic;
 public enum BlockSide{
 	LEFT =0,
 	RIGHT,
@@ -12,33 +11,24 @@ public enum BlockSide{
 }
 public struct BlockData
 {
-	bool _on;
-	int _sVert;
-	int _eVert;
+	public bool _on;
+	public int _faceCount;
 };
 //List<int> lst = ints.OfType<int>().ToList(); // this isn't going to be fast.
 public class Chunk {
 	public static Vector3 _size = new Vector3 (5, 5, 5);
-	Block[] _allBlocks;
+	//Block[] _allBlocks;
 	Vector3 _position;
 	Mesh _mesh;
 	GameObject _collider;
 	bool[] _boolMap;
-	List<Vector3> _vertices = new List<Vector3>();
-	List<Vector2> _uvs = new List<Vector2>();
-	List<int> _tris = new List<int>();
-	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider) {
+	List<BlockData> _allBlocks;
+	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider, List<BlockData> blocks) {
 		_position = chunkPos;
 		_mesh = mesh;
 		_collider = collider;
+		_allBlocks = blocks;
 
-	}
-	public void InitMeshData(List<Vector3> verts, List<Vector2> uvs, List<int> tris, bool[] map) {
-		_vertices = verts;
-		_uvs = uvs;
-		_tris = tris;
-		_boolMap = map;
-		
 	}
 	public void CreateCube(Vector3Int pos) {
 		ChunkGenerator.CreateCube(pos, ref _mesh, ref _boolMap);
@@ -68,7 +58,7 @@ public class Chunk {
 
 
 	public Chunk(Vector3 chunkPos){
-		_collider = null;
+		/*_collider = null;
 		int nrOfCubes = (int)(Chunk._size.x * Chunk._size.y * Chunk._size.z);
 		_mesh = new Mesh();
 		//number of sides of cube * number of vertices per side * number of cubes
@@ -113,14 +103,14 @@ public class Chunk {
 		_collider = new GameObject();
 		_collider.transform.position = _position;
 		_collider.AddComponent<MeshCollider>();
-		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;*/
 	}
 	public void SetChunkPos(Vector3 position){
 		_position = position;
 	}
 
 	private void GetNeighbors(ref Block[] array, Vector3 position){
-		if (array.Length != 6)
+		/*if (array.Length != 6)
 			return;
 		position -= _position;
 
@@ -177,7 +167,7 @@ public class Chunk {
 			array [(int)BlockSide.BOTTOM] = null;
 		else
 			array [(int)BlockSide.BOTTOM] = _allBlocks [ (int)(pos.x*(_size.y*_size.z)+ pos.y*(_size.z)+pos.z)];
-	}
+	*/}
 	public void Draw(Material mat)
 	{
 		Graphics.DrawMesh(_mesh, _position, Quaternion.identity, mat, 0);
@@ -186,16 +176,17 @@ public class Chunk {
 		BlockFactory.Instance.Draw (_mesh, _position);
 	}
 	public Block GetBlock(Vector3 position){
-		
-		position -= _position;
-		//Debug.Log (position);
-		int index = GetIndex (position);
-		if (index == -1)
-			return null;
-		return _allBlocks [index];
+
+		/*	position -= _position;
+			//Debug.Log (position);
+			int index = GetIndex (position);
+			if (index == -1)
+				return null;
+			return _allBlocks [index];*/
+		return null;
 	}
 	public Block GetBlock(int index){
-		return _allBlocks [index];
+		return null;// _allBlocks [index];
 	}
 	public int GetIndex(Vector3 position){
 		Vector3 pos = new Vector3(Mathf.Round(position.x/Block._size.x), Mathf.Round(position.y/Block._size.y), Mathf.Round(position.z/Block._size.z));
@@ -207,33 +198,34 @@ public class Chunk {
 		return _position;
 	}
 	public void RecalculateChunk(){
-		int index = 0;
-		Vector2[] uvs = new Vector2[_mesh.vertexCount];
-		List<int> tris = new List<int>();
-		BlockFactory bFactory = BlockFactory.Instance;
-		int nrOfVisibleBlocks = 0;
-		for (int x = 0; x < _size.x; x++) {
-			for (int y = 0; y < _size.y; y++) {
-				for (int z = 0; z < _size.z; z++) {
-					_allBlocks [index].Position = new Vector3(x * Block._size.x , y * Block._size.y, z * Block._size.z)+_position;
-					//set type of every block
-					bool[] nBools = bFactory.SetBlockType(ref _allBlocks[index]);
-					if (nBools != null) nrOfVisibleBlocks++;
-					//create triangles if any
-					bFactory.CreateTris(ref tris, nBools, index);
-					bFactory.SetUvs (ref uvs, _allBlocks[index], index);
-					index++;
+		/*	int index = 0;
+			Vector2[] uvs = new Vector2[_mesh.vertexCount];
+			List<int> tris = new List<int>();
+			BlockFactory bFactory = BlockFactory.Instance;
+			int nrOfVisibleBlocks = 0;
+			for (int x = 0; x < _size.x; x++) {
+				for (int y = 0; y < _size.y; y++) {
+					for (int z = 0; z < _size.z; z++) {
+						_allBlocks [index].Position = new Vector3(x * Block._size.x , y * Block._size.y, z * Block._size.z)+_position;
+						//set type of every block
+						bool[] nBools = bFactory.SetBlockType(ref _allBlocks[index]);
+						if (nBools != null) nrOfVisibleBlocks++;
+						//create triangles if any
+						bFactory.CreateTris(ref tris, nBools, index);
+						bFactory.SetUvs (ref uvs, _allBlocks[index], index);
+						index++;
 
+					}
 				}
 			}
-		}
-		_mesh.uv = uvs;
-		_mesh.triangles = tris.ToArray();
-		if (nrOfVisibleBlocks <= 0) return;
-		if(_collider == null)
-			_collider = new GameObject();
-		_collider.transform.position = _position;
-		_collider.AddComponent<MeshCollider>();
-		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+			_mesh.uv = uvs;
+			_mesh.triangles = tris.ToArray();
+			if (nrOfVisibleBlocks <= 0) return;
+			if(_collider == null)
+				_collider = new GameObject();
+			_collider.transform.position = _position;
+			_collider.AddComponent<MeshCollider>();
+			_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;*/
+		//return null;
 	}
 }

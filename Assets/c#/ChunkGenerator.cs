@@ -23,7 +23,8 @@ public class ChunkGenerator : MonoBehaviour
 		List<Vector3> normals = new List<Vector3>();
 		BlockFactory bFactory = BlockFactory.Instance;
 		Vector3 bSize = Block._size;
-
+		List<BlockData> blocks = new List<BlockData>();
+		Block b;
 		bool[] boolMap = new bool[nrOfCubes];
 		int index = 0;
 		int nrOfVisibleBlocks = 0;
@@ -42,6 +43,7 @@ public class ChunkGenerator : MonoBehaviour
 		}
 		Vector3Int pos = new Vector3Int();
 		index = 0;
+		BlockData bd;
 		for (int x = 0; x < Chunk._size.x; x++)
 		{
 			for (int y = 0; y < Chunk._size.y; y++)
@@ -53,7 +55,12 @@ public class ChunkGenerator : MonoBehaviour
 					{
 						//get neighbours 
 						bool[] bools = GetNeighbours(pos, ref boolMap);
+						int vertCount = vertices.Count;
 						MakeCubeMesh(bools, pos, ref vertices, ref tris, ref uvs);
+						vertCount = vertices.Count - vertCount;
+						bd._faceCount = vertCount / 4;
+						bd._on = true;
+						blocks.Add(bd);
 						index++;
 					}
 				}
@@ -70,9 +77,10 @@ public class ChunkGenerator : MonoBehaviour
 		collider.AddComponent<MeshCollider>();
 		collider.GetComponent<MeshCollider>().sharedMesh = mesh;
 
-		chunk = new Chunk(position, mesh, collider);
-		chunk.InitMeshData(vertices, uvs, tris, boolMap);
+		chunk = new Chunk(position, mesh, collider, blocks);
+		
 	}
+	#region make cude code
 	static public void MakeCubeMesh(bool[] nbools, Vector3Int pos, ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs)
 	{
 		if (!nbools[0])
@@ -294,6 +302,7 @@ public class ChunkGenerator : MonoBehaviour
 		int index = (int)(pos.z + pos.y * Chunk._size.y + Chunk._size.x * Chunk._size.x * pos.x);
 		return boolMap[index];
 	}
+	#endregion
 	public static void CreateCube(Vector3Int pos, ref Mesh mesh, ref bool[] boolMap)
 	{
 		List<Vector3> verts = new List<Vector3>(mesh.vertices);
@@ -324,10 +333,48 @@ public class ChunkGenerator : MonoBehaviour
 		//_mesh.normals = normals;
 		mesh.RecalculateNormals();
 	}
-	void Temp(Vector3Int pos, ref Mesh mesh, ref bool[] boolMap) {
+	void Temp(Vector3Int pos, ref Mesh mesh, ref bool[] boolMap, ref List<BlockData> blocks) {
 		List<Vector3> verts = new List<Vector3>(mesh.vertices);
 		List<Vector2> uvs = new List<Vector2>(mesh.uv);
 		List<int> tris = new List<int>(mesh.triangles);
-		boolMap[GetIndexFromPos(pos)] = false;
+		int center = GetIndexFromPos(pos);
+		boolMap[center] = false;
+
+		List<int> nIdeces;
+		Pair<int, int>[] all_S_E = new Pair<int, int>[7];
+		//lrfbtb
+		//let the center be the last thing in the array :D
+		GetNeighborIndeces(pos, out nIdeces);
+		for (int i = 0; i < verts.Count; i++) {
+			//find match
+			//find start
+			//find end
+			//break once all matches found
+			
+			for (int j = 0; j < nIdeces.Count; j++) {
+				if (i == nIdeces[j]) {
+					//found match
+
+					all_S_E[j] = new Pair<int, int>(i, i + (blocks[i]._faceCount * 4));
+					nIdeces.RemoveAt(j);
+					
+				}
+			}
+			if (nIdeces.Count == 0) break;
+
+		}
+
+		//continue later 
+	}
+	void GetNeighborIndeces(Vector3Int pos, out List<int> indeces) {
+		indeces = new List<int>();
+	}
+}
+public class Pair<T, U> {
+	public T one;
+	public U two;
+	public Pair(T o, U w) {
+		one = o;
+		two = w;
 	}
 }

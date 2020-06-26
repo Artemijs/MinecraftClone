@@ -1,6 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using System.Collections.Generic;
 public enum BlockSide{
 	LEFT =0,
 	RIGHT,
@@ -9,6 +10,13 @@ public enum BlockSide{
 	TOP,
 	BOTTOM
 }
+public struct BlockData
+{
+	bool _on;
+	int _sVert;
+	int _eVert;
+};
+//List<int> lst = ints.OfType<int>().ToList(); // this isn't going to be fast.
 public class Chunk {
 	public static Vector3 _size = new Vector3 (5, 5, 5);
 	Block[] _allBlocks;
@@ -16,17 +24,48 @@ public class Chunk {
 	Mesh _mesh;
 	GameObject _collider;
 	bool[] _boolMap;
+	List<Vector3> _vertices = new List<Vector3>();
+	List<Vector2> _uvs = new List<Vector2>();
+	List<int> _tris = new List<int>();
 	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider) {
 		_position = chunkPos;
 		_mesh = mesh;
 		_collider = collider;
 
 	}
-	public bool GetBoolFromPos(Vector3Int pos)
-	{
-		int index = (int)(pos.z + pos.y * _size.y + _size.x * _size.x * pos.x);
-		return _boolMap[index];
+	public void InitMeshData(List<Vector3> verts, List<Vector2> uvs, List<int> tris, bool[] map) {
+		_vertices = verts;
+		_uvs = uvs;
+		_tris = tris;
+		_boolMap = map;
+		
 	}
+	public void CreateCube(Vector3Int pos) {
+		ChunkGenerator.CreateCube(pos, ref _mesh, ref _boolMap);
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+	}
+	public void DeleteCube(Vector3Int pos)
+	{
+		ChunkGenerator.DeleteCube(pos, ref _mesh, ref _boolMap);
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+	}
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 	public Chunk(Vector3 chunkPos){
 		_collider = null;

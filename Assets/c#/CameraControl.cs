@@ -9,10 +9,14 @@ public class CameraControl : MonoBehaviour {
 	public Vector3 cameraDir;
 	//Vector3 _offsetPos;
 	Vector3 _offsetAng;
+	Vector3 _3rdPerspOffset;
 	Vector2 mouseAxis;
+	bool _3rdPerson = true;
+	
 	// Use this for initialization
 	void Start () {
 		camera = gameObject.transform.GetChild (0).gameObject;
+		_3rdPerspOffset = camera.transform.localPosition;
 		_offsetAng = gameObject.transform.localRotation.eulerAngles;
 		//_offsetPos = gameObject.transform.position;
 		mouseAxis = new Vector2(gameObject.transform.localRotation.eulerAngles.x, gameObject.transform.localRotation.eulerAngles.y);
@@ -46,6 +50,21 @@ public class CameraControl : MonoBehaviour {
 		lrot.eulerAngles = new Vector3 (-mouseAxis.y, mouseAxis.x, 0);//mouseDelta * 0.1f;
 		gameObject.transform.localRotation = lrot;
 		//mouseOld = mouseNevv;
+		if (Input.GetKeyDown(KeyCode.Alpha1)) {
+			Change2FirstPerson();
+		}
+	}
+	public void Change2FirstPerson() {
+		if (_3rdPerson)
+		{
+			camera.transform.localPosition = new Vector3(0, 1, 0);
+			_3rdPerson = false;
+		}
+		else {
+			camera.transform.localPosition = _3rdPerspOffset;
+			_3rdPerson = true;
+		}
+		
 
 	}
 }

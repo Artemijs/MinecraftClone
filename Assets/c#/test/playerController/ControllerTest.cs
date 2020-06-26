@@ -4,24 +4,40 @@ using UnityEngine;
 /// <summary>
 /// prototype version of player controller 
 /// </summary>
+
 public class ControllerTest : MonoBehaviour {
 
 	GameObject _camera;
 	//BBox[] _collisionBoxes;
-
+	public GameObject _targetIndicator;
 	bool _changedBlock = false;
 	bool _lock = false;
+	Main _main;
 	void Start () {
-		
+		//_targetIndicator = GameObject.Instantiate(_targetIndicator);
 		
 		_camera = GameObject.Find ("Camera");
+		_main = GameObject.Find("Main").GetComponent<Main>();
 		
 
 	}
 	// Update is called once per frame
 	void Update () {
 		HandleInput ();
+		HandleTargetCursor();
+		HandleMouseInput();
 		//CheckBlockChange ();
+	}
+	private void HandleMouseInput() {
+		if (Input.GetMouseButtonDown(0)) {
+			if(Vector3.Distance(transform.position, _targetIndicator.transform.position)< 2)
+				_main.CreateBlock(_targetIndicator.transform.position);
+		}
+		if (Input.GetMouseButtonDown(1))
+		{
+			if (Vector3.Distance(transform.position, _targetIndicator.transform.position) < 2)
+				_main.DeleteBlock(_targetIndicator.transform.position);
+		}
 	}
 	private void HandleInput(){
 		float speed = 4;
@@ -49,6 +65,18 @@ public class ControllerTest : MonoBehaviour {
 				GetComponent<Rigidbody>().useGravity = true;
 			}
 
+	}
+	void HandleTargetCursor() {
+		RaycastHit hitInfo;
+		if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hitInfo, 100.0f))
+		{
+			Debug.Log("Hanppened");
+			_targetIndicator.transform.position = hitInfo.point;
+		}
+		else {
+			Debug.Log("NEVER Hanppened");
+			_targetIndicator.transform.position = Vector3.zero;
+		}
 	}
 	private void CheckBlockChange (){
 		//legacy, will be rewritten later

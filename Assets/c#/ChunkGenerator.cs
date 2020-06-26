@@ -4,14 +4,14 @@ using UnityEngine;
 
 public class ChunkGenerator : MonoBehaviour
 {
-    // Start is called before the first frame update
-    void Start()
-    {
-        
-    }
+	// Start is called before the first frame update
+	void Start()
+	{
+
+	}
 
 	public void MakeChunk(out Chunk chunk, Vector3 position) {
-		
+
 
 		GameObject collider = null;
 		int nrOfCubes = (int)(Chunk._size.x * Chunk._size.y * Chunk._size.z);
@@ -23,7 +23,7 @@ public class ChunkGenerator : MonoBehaviour
 		List<Vector3> normals = new List<Vector3>();
 		BlockFactory bFactory = BlockFactory.Instance;
 		Vector3 bSize = Block._size;
-		
+
 		bool[] boolMap = new bool[nrOfCubes];
 		int index = 0;
 		int nrOfVisibleBlocks = 0;
@@ -35,6 +35,7 @@ public class ChunkGenerator : MonoBehaviour
 				for (int z = 0; z < Chunk._size.z; z++)
 				{
 					boolMap[index] = (y == 2 && x != 1);
+					//boolMap[index] = true;
 					index++;
 				}
 			}
@@ -70,8 +71,9 @@ public class ChunkGenerator : MonoBehaviour
 		collider.GetComponent<MeshCollider>().sharedMesh = mesh;
 
 		chunk = new Chunk(position, mesh, collider);
+		chunk.InitMeshData(vertices, uvs, tris, boolMap);
 	}
-	void MakeCubeMesh(bool[] nbools, Vector3Int pos, ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs)
+	static public void MakeCubeMesh(bool[] nbools, Vector3Int pos, ref List<Vector3> verts, ref List<int> tris, ref List<Vector2> uvs)
 	{
 		if (!nbools[0])
 		{//left
@@ -104,7 +106,7 @@ public class ChunkGenerator : MonoBehaviour
 			AddUVSet(ref uvs);
 		}
 	}
-	void AddUVSet(ref List<Vector2> uvs)
+	static public void AddUVSet(ref List<Vector2> uvs)
 	{
 		uvs.AddRange(new Vector2[] {
 			new Vector2(0.0f, 0.0f),
@@ -113,7 +115,7 @@ public class ChunkGenerator : MonoBehaviour
 			new Vector2(1.0f, 1.0f)
 		});
 	}
-	void MakeTopPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
+	static public void MakeTopPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		float s = 0.5f;
 		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z - s));
@@ -132,7 +134,7 @@ public class ChunkGenerator : MonoBehaviour
 				});
 
 	}
-	void MakeLeftPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
+	static public void MakeLeftPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -152,7 +154,7 @@ public class ChunkGenerator : MonoBehaviour
 				});
 
 	}
-	void MakeRightPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
+	static public void MakeRightPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -172,7 +174,7 @@ public class ChunkGenerator : MonoBehaviour
 				});
 
 	}
-	void MakeBotPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
+	static public void MakeBotPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -192,7 +194,7 @@ public class ChunkGenerator : MonoBehaviour
 				});
 
 	}
-	void MakeForwardPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
+	static public void MakeForwardPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -212,7 +214,7 @@ public class ChunkGenerator : MonoBehaviour
 				});
 
 	}
-	void MakeBackPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
+	static public void MakeBackPlane(ref List<Vector3> verts, ref List<int> tris, Vector3Int pos)
 	{
 		//vert 0
 		float s = 0.5f;
@@ -232,7 +234,7 @@ public class ChunkGenerator : MonoBehaviour
 				});
 
 	}
-	public void SetUvs(ref List<Vector2> uvs, Block b, int index)
+	static public void SetUvs(ref List<Vector2> uvs, Block b, int index)
 	{
 		uvs.AddRange(new Vector2[] {
 			new Vector2(0.0f, 0.0f),
@@ -241,7 +243,7 @@ public class ChunkGenerator : MonoBehaviour
 			new Vector2(1.0f, 1.0f)
 		});
 	}
-	bool[] GetNeighbours(Vector3Int pos, ref bool[] allbools)
+	static public bool[] GetNeighbours(Vector3Int pos, ref bool[] allbools)
 	{
 		int i = 0;
 		bool[] bools = new bool[6];
@@ -274,7 +276,7 @@ public class ChunkGenerator : MonoBehaviour
 
 		return bools;
 	}
-	bool CheckOutOfBounds(Vector3Int pos1)
+	static public bool CheckOutOfBounds(Vector3Int pos1)
 	{
 		//if you are checking out of bounds of the array return a
 		return (pos1.x < 0 || pos1.x >= Chunk._size.x ||
@@ -282,14 +284,50 @@ public class ChunkGenerator : MonoBehaviour
 			pos1.z < 0 || pos1.z >= Chunk._size.z);
 
 	}
-	public int GetIndexFromPos(Vector3Int pos)
+	static public int GetIndexFromPos(Vector3Int pos)
 	{
-		return(int)(pos.z + pos.y * Chunk._size.y + Chunk._size.x * Chunk._size.x * pos.x);
-		
+		return (int)(pos.z + pos.y * Chunk._size.y + Chunk._size.x * Chunk._size.x * pos.x);
+
 	}
-	public bool GetBoolFromPos(Vector3Int pos, ref bool[] boolMap)
+	static public bool GetBoolFromPos(Vector3Int pos, ref bool[] boolMap)
 	{
 		int index = (int)(pos.z + pos.y * Chunk._size.y + Chunk._size.x * Chunk._size.x * pos.x);
 		return boolMap[index];
+	}
+	public static void CreateCube(Vector3Int pos, ref Mesh mesh, ref bool[] boolMap)
+	{
+		List<Vector3> verts = new List<Vector3>(mesh.vertices);
+		List<Vector2> uvs = new List<Vector2>(mesh.uv);
+		List<int> tris = new List<int>(mesh.triangles);
+		boolMap[GetIndexFromPos(pos)] = true;
+
+		ChunkGenerator.MakeCubeMesh(ChunkGenerator.GetNeighbours(pos, ref boolMap), pos,
+			ref verts, ref tris, ref uvs);
+		mesh.vertices = verts.ToArray();
+		mesh.uv = uvs.ToArray();
+		mesh.triangles = tris.ToArray();
+		//_mesh.normals = normals;
+		mesh.RecalculateNormals();
+	}
+	public static void DeleteCube(Vector3Int pos, ref Mesh mesh, ref bool[] boolMap)
+	{
+		List<Vector3> verts = new List<Vector3>(mesh.vertices);
+		List<Vector2> uvs = new List<Vector2>(mesh.uv);
+		List<int> tris = new List<int>(mesh.triangles);
+		boolMap[GetIndexFromPos(pos)] = false;
+
+		//ChunkGenerator.MakeCubeMesh(ChunkGenerator.GetNeighbours(pos, ref boolMap), pos,
+		//	ref verts, ref tris, ref uvs);
+		mesh.vertices = verts.ToArray();
+		mesh.uv = uvs.ToArray();
+		mesh.triangles = tris.ToArray();
+		//_mesh.normals = normals;
+		mesh.RecalculateNormals();
+	}
+	void Temp(Vector3Int pos, ref Mesh mesh, ref bool[] boolMap) {
+		List<Vector3> verts = new List<Vector3>(mesh.vertices);
+		List<Vector2> uvs = new List<Vector2>(mesh.uv);
+		List<int> tris = new List<int>(mesh.triangles);
+		boolMap[GetIndexFromPos(pos)] = false;
 	}
 }

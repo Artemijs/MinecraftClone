@@ -4,19 +4,16 @@ using UnityEngine;
 
 public class IfTest : MonoBehaviour {
 
+	Chunk c;
+	public Material mat;
 	// Use this for initialization
 	void Start () {
-		int a = 1;
-		int b = 1;
-		int c = 3;
-		Debug.Log ((c | b));
-		if (a == (c | b)) {
-			Debug.Log ("TRUE");
-		}
+	
+		c = new Chunk(new Vector3(0, 0, 0), 0);
 	}
 	
 	// Update is called once per frame
 	void Update () {
-		
+		c.Draw(mat);
 	}
 }

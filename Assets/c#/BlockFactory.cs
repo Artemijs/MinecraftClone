@@ -152,6 +152,13 @@ public class BlockFactory {
 			}
 		}
 	}
+	/// <summary>
+	/// this has to do with how the texture is sampled in the shader:D
+	/// allowing you to keep all the textures in one file
+	/// </summary>
+	/// <param name="uvs"></param>
+	/// <param name="b"></param>
+	/// <param name="index"></param>
 	public void SetUvs(ref Vector2[] uvs, Block b, int index){
 		//4 uvs per plane
 		/*for (int i = 0; i < uvs.Length; i += 4) {

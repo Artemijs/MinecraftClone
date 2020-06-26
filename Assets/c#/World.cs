@@ -5,8 +5,8 @@ using UnityEngine;
 public class World : MonoBehaviour {
 	bool _ready = false;
 	// Use this for initialization
-	public static Vector3 _worldSize = new Vector3(10, 3, 10);
-	//public static Vector3 _worldSize = new Vector3(6, 6, 6);
+	//public static Vector3 _worldSize = new Vector3(10, 3, 10);
+	public static Vector3 _worldSize = new Vector3(20, 20, 20);
 	GameObject _player;
 	ChunkController _chunkCtrl;
 	void Start () {

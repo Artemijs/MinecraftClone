@@ -12,7 +12,6 @@ public enum BlockSide{
 public struct BlockData
 {
 	public bool _on;
-	public int _faceCount;
 };
 //List<int> lst = ints.OfType<int>().ToList(); // this isn't going to be fast.
 public class Chunk {
@@ -21,24 +20,30 @@ public class Chunk {
 	Vector3 _position;
 	Mesh _mesh;
 	GameObject _collider;
-	bool[] _boolMap;
 	List<BlockData> _allBlocks;
-	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider, List<BlockData> blocks, bool[] bools) {
+	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider,
+		List<BlockData> blocks) {
 		_position = chunkPos;
 		_mesh = mesh;
 		_collider = collider;
 		_allBlocks = blocks;
-		_boolMap = bools;
+		//_boolMap = bools;
 
 	}
 	public void CreateCube(Vector3Int pos) {
-		//ChunkGenerator.CreateCube(pos, ref _mesh, ref _boolMap);
-		//_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+		ChunkGenerator.CreateCube(pos,  _mesh, _allBlocks);
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 	}
 	public void DeleteCube(Vector3Int pos)
 	{
-		ChunkGenerator.Temp(pos, ref _mesh, ref _boolMap, ref _allBlocks);
+		//ChunkGenerator.Temp(pos, ref _mesh, ref _boolMap, ref _allBlocks);
+		ChunkGenerator.DeleteCube(pos, _mesh, _allBlocks);
 		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+		
+	}
+	public GameObject Collider {
+		get { return _collider; }
+		set { _collider = value; }
 	}
 
 

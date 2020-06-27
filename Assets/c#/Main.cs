@@ -32,7 +32,7 @@ public class Main : MonoBehaviour
 	public void DeleteBlock(Vector3 pos)
 	{
 		Vector3Int intPos = new Vector3Int(Mathf.RoundToInt(pos.x), (int)(pos.y), Mathf.RoundToInt(pos.z));
-		intPos.y += 1;
+		//intPos.y -= 1;
 		_chunk.DeleteCube(intPos);
 	}
 }

@@ -23,20 +23,21 @@ public class Chunk {
 	GameObject _collider;
 	bool[] _boolMap;
 	List<BlockData> _allBlocks;
-	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider, List<BlockData> blocks) {
+	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider, List<BlockData> blocks, bool[] bools) {
 		_position = chunkPos;
 		_mesh = mesh;
 		_collider = collider;
 		_allBlocks = blocks;
+		_boolMap = bools;
 
 	}
 	public void CreateCube(Vector3Int pos) {
-		ChunkGenerator.CreateCube(pos, ref _mesh, ref _boolMap);
-		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
+		//ChunkGenerator.CreateCube(pos, ref _mesh, ref _boolMap);
+		//_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 	}
 	public void DeleteCube(Vector3Int pos)
 	{
-		ChunkGenerator.DeleteCube(pos, ref _mesh, ref _boolMap);
+		ChunkGenerator.Temp(pos, ref _mesh, ref _boolMap, ref _allBlocks);
 		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 	}
 

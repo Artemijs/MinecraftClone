@@ -23,13 +23,15 @@ public class Main : MonoBehaviour
 		_chunk.Draw(mat);
     }
 	public void CreateBlock(Vector3 pos) {
-		Vector3Int intPos = new Vector3Int((int)(pos.x), (int)(pos.y), (int)(pos.z));
+		Vector3Int intPos = new Vector3Int(Mathf.RoundToInt(pos.x), (int)(pos.y), Mathf.RoundToInt(pos.z));
+		Debug.Log("original " + pos);
+		Debug.Log("int " + intPos);
 		intPos.y += 1;
 		_chunk.CreateCube(intPos);
 	}
 	public void DeleteBlock(Vector3 pos)
 	{
-		Vector3Int intPos = new Vector3Int((int)(pos.x), (int)(pos.y), (int)(pos.z));
+		Vector3Int intPos = new Vector3Int(Mathf.RoundToInt(pos.x), (int)(pos.y), Mathf.RoundToInt(pos.z));
 		intPos.y += 1;
 		_chunk.DeleteCube(intPos);
 	}

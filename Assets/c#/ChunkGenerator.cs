@@ -33,7 +33,8 @@ public class ChunkGenerator : MonoBehaviour
 			{
 				for (int z = 0; z < Chunk._size.z; z++)
 				{
-					bd._on = (y == 2);
+					bd._on = (y <= 0);
+					//bd._on = (y == 0 && x == 0 && z == 0);
 					blocks.Add(bd);
 					//boolMap[index] = true;
 					index++;
@@ -118,10 +119,10 @@ public class ChunkGenerator : MonoBehaviour
 	}
 	static public void MakeTopPlane( List<Vector3> verts,  List<int> tris, Vector3Int pos)
 	{
-		float s = 0.5f;
-		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z - s));
-		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z + s));
-		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z - s));
+		float s = 1;
+		verts.Add(new Vector3(pos.x , pos.y + s, pos.z ));
+		verts.Add(new Vector3(pos.x , pos.y + s, pos.z + s));
+		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z ));
 		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z + s));
 		int start = verts.Count - 4;
 		tris.AddRange(new int[]{
@@ -138,11 +139,11 @@ public class ChunkGenerator : MonoBehaviour
 	static public void MakeLeftPlane( List<Vector3> verts,  List<int> tris, Vector3Int pos)
 	{
 		//vert 0
-		float s = 0.5f;
-		verts.Add(new Vector3(pos.x - s, pos.y - s, pos.z + s));
-		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z + s));
-		verts.Add(new Vector3(pos.x - s, pos.y - s, pos.z - s));
-		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z - s));
+		float s = 1;
+		verts.Add(new Vector3(pos.x, pos.y, pos.z + s));
+		verts.Add(new Vector3(pos.x , pos.y + s, pos.z + s));
+		verts.Add(new Vector3(pos.x , pos.y , pos.z ));
+		verts.Add(new Vector3(pos.x , pos.y + s, pos.z ));
 		int start = verts.Count - 4;
 		tris.AddRange(new int[]{
 					0 + start,
@@ -158,10 +159,10 @@ public class ChunkGenerator : MonoBehaviour
 	static public void MakeRightPlane( List<Vector3> verts,  List<int> tris, Vector3Int pos)
 	{
 		//vert 0
-		float s = 0.5f;
-		verts.Add(new Vector3(pos.x + s, pos.y - s, pos.z - s));
-		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z - s));
-		verts.Add(new Vector3(pos.x + s, pos.y - s, pos.z + s));
+		float s = 1;
+		verts.Add(new Vector3(pos.x + s, pos.y , pos.z ));
+		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z ));
+		verts.Add(new Vector3(pos.x + s, pos.y , pos.z + s));
 		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z + s));
 		int start = verts.Count - 4;
 		tris.AddRange(new int[]{
@@ -178,11 +179,11 @@ public class ChunkGenerator : MonoBehaviour
 	static public void MakeBotPlane( List<Vector3> verts,  List<int> tris, Vector3Int pos)
 	{
 		//vert 0
-		float s = 0.5f;
-		verts.Add(new Vector3(pos.x + s, pos.y - s, pos.z - s));
-		verts.Add(new Vector3(pos.x + s, pos.y - s, pos.z + s));
-		verts.Add(new Vector3(pos.x - s, pos.y - s, pos.z - s));
-		verts.Add(new Vector3(pos.x - s, pos.y - s, pos.z + s));
+		float s = 1;
+		verts.Add(new Vector3(pos.x + s, pos.y , pos.z ));
+		verts.Add(new Vector3(pos.x + s, pos.y , pos.z + s));
+		verts.Add(new Vector3(pos.x , pos.y , pos.z ));
+		verts.Add(new Vector3(pos.x , pos.y , pos.z + s));
 		int start = verts.Count - 4;
 		tris.AddRange(new int[]{
 					0 + start,
@@ -198,11 +199,11 @@ public class ChunkGenerator : MonoBehaviour
 	static public void MakeForwardPlane( List<Vector3> verts,  List<int> tris, Vector3Int pos)
 	{
 		//vert 0
-		float s = 0.5f;
-		verts.Add(new Vector3(pos.x + s, pos.y - s, pos.z + s));
+		float s = 1;
+		verts.Add(new Vector3(pos.x + s, pos.y , pos.z + s));
 		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z + s));
-		verts.Add(new Vector3(pos.x - s, pos.y - s, pos.z + s));
-		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z + s));
+		verts.Add(new Vector3(pos.x , pos.y, pos.z + s));
+		verts.Add(new Vector3(pos.x, pos.y + s, pos.z + s));
 		int start = verts.Count - 4;
 		tris.AddRange(new int[]{
 					0 + start,
@@ -218,11 +219,11 @@ public class ChunkGenerator : MonoBehaviour
 	static public void MakeBackPlane( List<Vector3> verts,  List<int> tris, Vector3Int pos)
 	{
 		//vert 0
-		float s = 0.5f;
-		verts.Add(new Vector3(pos.x - s, pos.y - s, pos.z - s));
-		verts.Add(new Vector3(pos.x - s, pos.y + s, pos.z - s));
-		verts.Add(new Vector3(pos.x + s, pos.y - s, pos.z - s));
-		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z - s));
+		float s = 1;
+		verts.Add(new Vector3(pos.x , pos.y , pos.z ));
+		verts.Add(new Vector3(pos.x , pos.y + s, pos.z ));
+		verts.Add(new Vector3(pos.x + s, pos.y , pos.z ));
+		verts.Add(new Vector3(pos.x + s, pos.y + s, pos.z ));
 		int start = verts.Count - 4;
 		tris.AddRange(new int[]{
 					0 + start,
@@ -257,6 +258,9 @@ public class ChunkGenerator : MonoBehaviour
 	}
 	static public bool[] GetNeighbours(Vector3Int pos, List<BlockData> allbools)
 	{
+		
+		if(pos.x == 4)
+			Debug.Log(pos);
 		int i = 0;
 		bool[] bools = new bool[6];
 		Vector3Int nPos = pos + new Vector3Int(-1, 0, 0);//left
@@ -365,7 +369,18 @@ public class ChunkGenerator : MonoBehaviour
 
 		//chunk = new Chunk(position, mesh, collider, blocks, boolMap);
 	}
-	
+	public static BlockSide GetBlockSide(Vector3 normal) {
+		BlockSide bs = BlockSide.TOP;
+
+		if (normal == Vector3.up) bs = BlockSide.TOP;
+		else if (normal == Vector3.down) bs = BlockSide.BOTTOM;
+		else if (normal == Vector3.right) bs = BlockSide.RIGHT;
+		else if (normal == Vector3.left) bs = BlockSide.LEFT;
+		else if (normal == Vector3.forward) bs = BlockSide.FORWARD;
+		else if (normal == Vector3.back) bs = BlockSide.BACK;
+
+		return bs;
+	}
 }
 public class Pair<T, U> {
 	public T one;

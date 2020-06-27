@@ -13,6 +13,7 @@ public class ControllerTest : MonoBehaviour {
 	bool _changedBlock = false;
 	bool _lock = false;
 	Main _main;
+	Vector3 _cursorNormal;
 	void Start () {
 		//_targetIndicator = GameObject.Instantiate(_targetIndicator);
 		
@@ -30,13 +31,13 @@ public class ControllerTest : MonoBehaviour {
 	}
 	private void HandleMouseInput() {
 		if (Input.GetMouseButtonDown(0)) {
-			if(Vector3.Distance(transform.position, _targetIndicator.transform.position)< 2)
-				_main.CreateBlock(_targetIndicator.transform.position);
+			if(Vector3.Distance(transform.position, _targetIndicator.transform.position)< 5)
+				_main.CreateBlock(_targetIndicator.transform.position, _cursorNormal);
 		}
 		if (Input.GetMouseButtonDown(1))
 		{
-			if (Vector3.Distance(transform.position, _targetIndicator.transform.position) < 2)
-				_main.DeleteBlock(_targetIndicator.transform.position);
+			if (Vector3.Distance(transform.position, _targetIndicator.transform.position) < 5)
+				_main.DeleteBlock(_targetIndicator.transform.position, _cursorNormal);
 		}
 	}
 	private void HandleInput(){
@@ -58,6 +59,18 @@ public class ControllerTest : MonoBehaviour {
 		if (Input.GetKey (KeyCode.Space)) {
 			playerDirf.y = 1.5f;
 		}
+		if (Input.GetKeyDown(KeyCode.Escape)) {
+			if (Cursor.visible)
+			{
+				Cursor.visible = false;
+				Cursor.lockState = CursorLockMode.Locked;
+			}
+			else
+			{
+				Cursor.visible = (true);
+				Cursor.lockState = CursorLockMode.None;
+			}
+		}
 		gameObject.GetComponent<Rigidbody> ().velocity = playerDirf*speed;//
 		if(!_lock)
 			if (playerDirf != Vector3.zero) {
@@ -72,10 +85,12 @@ public class ControllerTest : MonoBehaviour {
 		{
 			Debug.Log("Hanppened");
 			_targetIndicator.transform.position = hitInfo.point;
+			_cursorNormal = hitInfo.normal;
 		}
 		else {
 			Debug.Log("NEVER Hanppened");
 			_targetIndicator.transform.position = Vector3.zero;
+			_cursorNormal = Vector3.zero;
 		}
 	}
 	private void CheckBlockChange (){

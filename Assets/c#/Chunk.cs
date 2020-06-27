@@ -15,7 +15,7 @@ public struct BlockData
 };
 //List<int> lst = ints.OfType<int>().ToList(); // this isn't going to be fast.
 public class Chunk {
-	public static Vector3 _size = new Vector3 (5, 5, 5);
+	public static Vector3 _size = new Vector3 (10, 10, 10);
 	//Block[] _allBlocks;
 	Vector3 _position;
 	Mesh _mesh;

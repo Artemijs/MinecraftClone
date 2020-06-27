@@ -42,6 +42,10 @@ public class Chunk {
 		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 		
 	}
+	public BlockData GetBlockfromPos(Vector3Int pos) {
+		int index = (int)(pos.z + pos.y * Chunk._size.y + Chunk._size.x * Chunk._size.x * pos.x);
+		return _allBlocks[index];
+	}
 	public GameObject Collider {
 		get { return _collider; }
 		set { _collider = value; }

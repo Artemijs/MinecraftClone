@@ -13,13 +13,14 @@ public class ControllerTest : MonoBehaviour {
 	bool _changedBlock = false;
 	bool _lock = false;
 	Main _main;
+
+	Vector3Int _targetPos;
 	Vector3 _cursorNormal;
 	void Start () {
 		//_targetIndicator = GameObject.Instantiate(_targetIndicator);
 		
 		_camera = GameObject.Find ("Camera");
 		_main = GameObject.Find("Main").GetComponent<Main>();
-		
 
 	}
 	// Update is called once per frame
@@ -27,17 +28,26 @@ public class ControllerTest : MonoBehaviour {
 		HandleInput ();
 		HandleTargetCursor();
 		HandleMouseInput();
+
 		//CheckBlockChange ();
 	}
+
 	private void HandleMouseInput() {
 		if (Input.GetMouseButtonDown(0)) {
 			if(Vector3.Distance(transform.position, _targetIndicator.transform.position)< 5)
 				_main.CreateBlock(_targetIndicator.transform.position, _cursorNormal);
 		}
-		if (Input.GetMouseButtonDown(1))
+		if (Input.GetMouseButton(1))
 		{
 			if (Vector3.Distance(transform.position, _targetIndicator.transform.position) < 5)
-				_main.DeleteBlock(_targetIndicator.transform.position, _cursorNormal);
+			{
+				_main.StartDeletingBlock(_targetIndicator.transform.position, _cursorNormal);
+				
+				//SetTargetBlockPos(_targetIndicator.transform.position, _cursorNormal);
+			}
+		}
+		if (Input.GetMouseButtonUp(1)) {
+			_main.CancelDeleting();
 		}
 	}
 	private void HandleInput(){
@@ -86,6 +96,7 @@ public class ControllerTest : MonoBehaviour {
 			Debug.Log("Hanppened");
 			_targetIndicator.transform.position = hitInfo.point;
 			_cursorNormal = hitInfo.normal;
+			
 		}
 		else {
 			Debug.Log("NEVER Hanppened");
@@ -93,6 +104,7 @@ public class ControllerTest : MonoBehaviour {
 			_cursorNormal = Vector3.zero;
 		}
 	}
+	
 	private void CheckBlockChange (){
 		//legacy, will be rewritten later
 		/*int newId = _world.ChunkCtrl.GetBlockId (transform.position);

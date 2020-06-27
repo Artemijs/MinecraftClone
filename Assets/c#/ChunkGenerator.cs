@@ -393,6 +393,16 @@ public class ChunkGenerator : MonoBehaviour
 
 		return bs;
 	}
+	public static float GetToughnessFromType(BlockType type) {
+		//time it takes to break the block IN SECONMDS
+		float toughness = 0;
+		if (type == BlockType.DIRT || type == BlockType.DIRT_GRASS) toughness = 1.25f;
+		else if (type == BlockType.FROZEN_DIRT || type == BlockType.FROZEN_ICE_DIRT) toughness = 1.25f;
+		else if (type == BlockType.TREE_WOOD) toughness = 1.25f;
+		else if (type == BlockType.ROCK) toughness = 1.75f;
+		else toughness = 1.15f;
+		return toughness;
+	}
 }
 public class Pair<T, U> {
 	public T one;
@@ -400,5 +410,8 @@ public class Pair<T, U> {
 	public Pair(T o, U w) {
 		one = o;
 		two = w;
+	}
+	public Pair()
+	{
 	}
 }

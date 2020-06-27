@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-using System;
+
 public class ChunkGenerator : MonoBehaviour
 {
 	// Start is called before the first frame update
@@ -34,9 +34,12 @@ public class ChunkGenerator : MonoBehaviour
 				for (int z = 0; z < Chunk._size.z; z++)
 				{
 					bd._on = (y <= 0);
+					if (!bd._on) bd._type = BlockType.AIR;
+					else {
+						bd._type = (BlockType)(Random.Range(0, 5));
+					}
 					//bd._on = (y == 0 && x == 0 && z == 0);
 					blocks.Add(bd);
-					//boolMap[index] = true;
 					index++;
 				}
 			}
@@ -50,11 +53,12 @@ public class ChunkGenerator : MonoBehaviour
 				for (int z = 0; z < Chunk._size.z; z++)
 				{
 					pos.x = x; pos.y = y; pos.z = z;
-					if (GetBlockFromPos(pos,  blocks)._on)
+					bd = GetBlockFromPos(pos, blocks);
+					if (bd._on)
 					{
 						//get neighbours 
-						bool[] bools = GetNeighbours(pos, blocks);
-						MakeCubeMesh(bools, pos,  vertices,  tris,  uvs);
+						BlockData[] nBlocks = GetNeighbours(pos, blocks);
+						MakeCubeMesh(nBlocks, bd._type, pos,  vertices,  tris,  uvs);
 						index++;
 					}
 				}
@@ -75,46 +79,52 @@ public class ChunkGenerator : MonoBehaviour
 		
 	}
 	#region make cude code
-	static public void MakeCubeMesh(bool[] nbools, Vector3Int pos,  List<Vector3> verts,  List<int> tris,  List<Vector2> uvs)
+	static public void MakeCubeMesh(BlockData[] nBlocks, BlockType type, Vector3Int pos,  List<Vector3> verts,  List<int> tris,  List<Vector2> uvs)
 	{
-		if (!nbools[0])
+		if (!nBlocks[0]._on)
 		{//left
 			MakeLeftPlane( verts,  tris, pos);
-			AddUVSet( uvs);
+			AddUVSet( uvs, type, BlockSide.LEFT);
 		}
-		if (!nbools[1])
+		if (!nBlocks[1]._on)
 		{//right
 			MakeRightPlane( verts,  tris, pos);
-			AddUVSet( uvs);
+			AddUVSet( uvs, type, BlockSide.RIGHT);
 		}
-		if (!nbools[2])
+		if (!nBlocks[2]._on)
 		{//forward
 			MakeForwardPlane( verts,  tris, pos);
-			AddUVSet( uvs);
+			AddUVSet( uvs, type, BlockSide.FORWARD);
 		}
-		if (!nbools[3])
+		if (!nBlocks[3]._on)
 		{//back
 			MakeBackPlane( verts,  tris, pos);
-			AddUVSet( uvs);
+			AddUVSet( uvs, type, BlockSide.BACK);
 		}
-		if (!nbools[4])
+		if (!nBlocks[4]._on)
 		{//top
 			MakeTopPlane( verts,  tris, pos);
-			AddUVSet( uvs);
+			AddUVSet( uvs, type, BlockSide.TOP);
 		}
-		if (!nbools[5])
+		if (!nBlocks[5]._on)
 		{//bottom
 			MakeBotPlane( verts,  tris, pos);
-			AddUVSet( uvs);
+			AddUVSet( uvs, type, BlockSide.BOTTOM);
 		}
 	}
-	static public void AddUVSet( List<Vector2> uvs)
+	static public void AddUVSet( List<Vector2> uvs, BlockType type, BlockSide side)
 	{
+		float s = 1 / 6.0f ;
+		s *= 1.01f;
+		int x = (int)(side);
+		int y = (int)(type);
+		 float w = 0.95f;
+		
 		uvs.AddRange(new Vector2[] {
-			new Vector2(0.0f, 0.0f),
-			new Vector2(1.0f, 0.0f),
-			new Vector2(0.0f, 1.0f),
-			new Vector2(1.0f, 1.0f)
+			new Vector2(((x + w) * s), 1-((y + w) * s)),
+			new Vector2(((x + w)) * s, 1-(y * s)),
+			new Vector2((x * s), 1-((y + w) * s) ),
+			new Vector2((x * s), 1-(y * s)),
 		});
 	}
 	static public void MakeTopPlane( List<Vector3> verts,  List<int> tris, Vector3Int pos)
@@ -256,41 +266,41 @@ public class ChunkGenerator : MonoBehaviour
 			new Vector2(1.0f, 1.0f)
 		});
 	}
-	static public bool[] GetNeighbours(Vector3Int pos, List<BlockData> allbools)
+	static public BlockData[] GetNeighbours(Vector3Int pos, List<BlockData> allbools)
 	{
 		
 		if(pos.x == 4)
 			Debug.Log(pos);
 		int i = 0;
-		bool[] bools = new bool[6];
+		BlockData[] bData = new BlockData[6];
 		Vector3Int nPos = pos + new Vector3Int(-1, 0, 0);//left
-		if (CheckOutOfBounds(nPos)) bools[i] = false;
-		else bools[i] = allbools[GetIndexFromPos(nPos)]._on;
+		if (CheckOutOfBounds(nPos)) bData[i]._on = false;
+		else bData[i] = allbools[GetIndexFromPos(nPos)];
 		i++;
 		nPos = pos + new Vector3Int(1, 0, 0);//right
-		if (CheckOutOfBounds(nPos)) bools[i] = false;
-		else bools[i] = allbools[GetIndexFromPos(nPos)]._on;
+		if (CheckOutOfBounds(nPos)) bData[i]._on = false;
+		else bData[i] = allbools[GetIndexFromPos(nPos)];
 		i++;
 		nPos = pos + new Vector3Int(0, 0, 1);//forward
-		if (CheckOutOfBounds(nPos)) bools[i] = false;
-		else bools[i] = allbools[GetIndexFromPos(nPos)]._on;
+		if (CheckOutOfBounds(nPos)) bData[i]._on = false;
+		else bData[i] = allbools[GetIndexFromPos(nPos)];
 		i++;
 		nPos = pos + new Vector3Int(0, 0, -1);//back
-		if (CheckOutOfBounds(nPos)) bools[i] = false;
-		else bools[i] = allbools[GetIndexFromPos(nPos)]._on;
+		if (CheckOutOfBounds(nPos)) bData[i]._on = false;
+		else bData[i] = allbools[GetIndexFromPos(nPos)];
 		i++;
 		nPos = pos + new Vector3Int(0, 1, 0);//top
-		if (CheckOutOfBounds(nPos)) bools[i] = false;
-		else bools[i] = allbools[GetIndexFromPos(nPos)]._on;
+		if (CheckOutOfBounds(nPos)) bData[i]._on = false;
+		else bData[i] = allbools[GetIndexFromPos(nPos)];
 		i++;
 		nPos = pos + new Vector3Int(0, -1, 0);//bot
-		if (CheckOutOfBounds(nPos)) bools[i] = false;
-		else bools[i] = allbools[GetIndexFromPos(nPos)]._on;
+		if (CheckOutOfBounds(nPos)) bData[i]._on = false;
+		else bData[i] = allbools[GetIndexFromPos(nPos)];
 
 
 		//l r f b t b
 
-		return bools;
+		return bData;
 	}
 	static public bool CheckOutOfBounds(Vector3Int pos1)
 	{
@@ -311,7 +321,7 @@ public class ChunkGenerator : MonoBehaviour
 		return boolMap[index];
 	}
 	#endregion
-	public static void CreateCube(Vector3Int pos, Mesh mesh, List<BlockData> blocks)
+	public static void CreateCube(Vector3Int pos, BlockType type, Mesh mesh, List<BlockData> blocks)
 	{
 		List<Vector3> verts = new List<Vector3>(mesh.vertices);
 		List<Vector2> uvs = new List<Vector2>(mesh.uv);
@@ -319,10 +329,11 @@ public class ChunkGenerator : MonoBehaviour
 
 		BlockData bd = blocks[GetIndexFromPos(pos)];
 		bd._on = true;
+		bd._type = type;
 		blocks[GetIndexFromPos(pos)] = bd;
 
-		ChunkGenerator.MakeCubeMesh(ChunkGenerator.GetNeighbours(pos, blocks), pos,
-			 verts,  tris,  uvs);
+		ChunkGenerator.MakeCubeMesh(ChunkGenerator.GetNeighbours(pos, blocks), bd._type,
+			pos, verts,  tris,  uvs);
 		mesh.vertices = verts.ToArray();
 		mesh.uv = uvs.ToArray();
 		mesh.triangles = tris.ToArray();
@@ -348,11 +359,12 @@ public class ChunkGenerator : MonoBehaviour
 				for (int z = 0; z < Chunk._size.z; z++)
 				{
 					pos.x = x; pos.y = y; pos.z = z;
-					if (GetBlockFromPos(pos, blocks)._on)
+					bd = GetBlockFromPos(pos, blocks);
+					if (bd._on)
 					{
 						//get neighbours 
-						bool[] bools = GetNeighbours(pos, blocks);
-						MakeCubeMesh(bools, pos,  vertices,  tris,  uvs);
+						BlockData[] nBlocks = GetNeighbours(pos, blocks);
+						MakeCubeMesh(nBlocks, bd._type, pos,  vertices,  tris,  uvs);
 
 					}
 				}

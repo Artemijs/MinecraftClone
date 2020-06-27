@@ -7,6 +7,7 @@ public class Main : MonoBehaviour
 	ChunkGenerator _chunkGen;
 	Chunk _chunk;
 	public Material mat;
+	BlockType _selectedType;
 	// Start is called before the first frame update
 	void Start()
     {
@@ -16,6 +17,7 @@ public class Main : MonoBehaviour
 		_chunkGen.MakeChunk(out _chunk, Vector3.zero);
 		Cursor.visible = false;
 		Cursor.lockState = CursorLockMode.Confined;
+		_selectedType = BlockType.DIRT;
 
 	}
 
@@ -23,7 +25,31 @@ public class Main : MonoBehaviour
     void Update()
     {
 		_chunk.Draw(mat);
-    }
+		HandleInput();
+
+	}
+	void HandleInput() {
+		if (Input.GetKeyDown(KeyCode.Alpha1)) {
+			_selectedType = BlockType.DIRT;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha2))
+		{
+			_selectedType = BlockType.DIRT_GRASS;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha3))
+		{
+			_selectedType = BlockType.FROZEN_DIRT;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha4))
+		{
+			_selectedType = BlockType.FROZEN_ICE_DIRT;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha5))
+		{
+			_selectedType = BlockType.TREE_WOOD;
+		}
+		
+	}
 	public void CreateBlock(Vector3 pos, Vector3 normal) {
 		//get block pos
 		pos -= new Vector3(0.01f*normal.x, 0.01f*normal.y, 0.01f*normal.z) ;
@@ -39,7 +65,7 @@ public class Main : MonoBehaviour
 		//Vector3Int intPos = new Vector3Int(Mathf.RoundToInt(pos.x), (int)(pos.y), Mathf.RoundToInt(pos.z));
 		Debug.Log("original " + pos  +" side "+bs.ToString());
 		Debug.Log("int " + intPos);
-		_chunk.CreateCube(intPos);
+		_chunk.CreateCube(intPos, _selectedType);
 	}
 	public void DeleteBlock(Vector3 pos, Vector3 normal)
 	{

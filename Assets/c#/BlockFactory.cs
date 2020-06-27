@@ -4,10 +4,17 @@ using UnityEngine;
 using UnityEngine.Rendering;
 public enum BlockType
 {
-	AIR=0,
-	ROCK,
-	GRASS,
-	DIRT
+
+	ROCK = 0,
+	DIRT,
+	DIRT_GRASS,
+	TREE_WOOD,
+	FROZEN_DIRT,
+	FROZEN_ICE_DIRT,
+	AIR,
+	GRASS
+
+
 };
 public class BlockFactory {
 	private static BlockFactory instance;

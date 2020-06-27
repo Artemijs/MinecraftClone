@@ -12,6 +12,7 @@ public enum BlockSide{
 public struct BlockData
 {
 	public bool _on;
+	public BlockType _type;
 };
 //List<int> lst = ints.OfType<int>().ToList(); // this isn't going to be fast.
 public class Chunk {
@@ -30,8 +31,8 @@ public class Chunk {
 		//_boolMap = bools;
 
 	}
-	public void CreateCube(Vector3Int pos) {
-		ChunkGenerator.CreateCube(pos,  _mesh, _allBlocks);
+	public void CreateCube(Vector3Int pos, BlockType type) {
+		ChunkGenerator.CreateCube(pos, type,  _mesh, _allBlocks);
 		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 	}
 	public void DeleteCube(Vector3Int pos)

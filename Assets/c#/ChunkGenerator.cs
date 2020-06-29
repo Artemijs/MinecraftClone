@@ -16,7 +16,7 @@ public class ChunkGenerator : MonoBehaviour
 
 
 		GameObject collider = null;
-		int nrOfCubes = (int)(Chunk._size.x * Chunk._size.y * Chunk._size.z);
+		int nrOfCubes = (int)(Chunk._size * Chunk._size * Chunk._size);
 		Mesh mesh = new Mesh();
 
 		List<Vector3> vertices = new List<Vector3>();
@@ -29,13 +29,13 @@ public class ChunkGenerator : MonoBehaviour
 		int index = 0;
 
 		//create a bool map
-		for (int x = 0; x < Chunk._size.x; x++)
+		for (int x = 0; x < Chunk._size; x++)
 		{
-			for (int y = 0; y < Chunk._size.y; y++)
+			for (int y = 0; y < Chunk._size; y++)
 			{
-				for (int z = 0; z < Chunk._size.z; z++)
+				for (int z = 0; z < Chunk._size; z++)
 				{
-					bd._on = (y + position .y<= 2);
+					bd._on = (y + position.y<= 2);
 					if (!bd._on) bd._type = BlockType.AIR;
 					else {
 						bd._type = (BlockType)(Random.Range(0, 5));
@@ -48,11 +48,11 @@ public class ChunkGenerator : MonoBehaviour
 		}
 		Vector3Int pos = new Vector3Int();
 		index = 0;
-		for (int x = 0; x < Chunk._size.x; x++)
+		for (int x = 0; x < Chunk._size; x++)
 		{
-			for (int y = 0; y < Chunk._size.y; y++)
+			for (int y = 0; y < Chunk._size; y++)
 			{
-				for (int z = 0; z < Chunk._size.z; z++)
+				for (int z = 0; z < Chunk._size; z++)
 				{
 					pos.x = x; pos.y = y; pos.z = z;
 					bd = GetBlockFromPos(pos, blocks);
@@ -259,7 +259,7 @@ public class ChunkGenerator : MonoBehaviour
 					1 + offset
 				});
 	}
-	static public void SetUvs( List<Vector2> uvs, Block b, int index)
+	/*static public void SetUvs( List<Vector2> uvs, Block b, int index)
 	{
 		uvs.AddRange(new Vector2[] {
 			new Vector2(0.0f, 0.0f),
@@ -267,7 +267,7 @@ public class ChunkGenerator : MonoBehaviour
 			new Vector2(0.0f, 1.0f),
 			new Vector2(1.0f, 1.0f)
 		});
-	}
+	}*/
 	static public BlockData[] GetNeighbours(Vector3Int pos, List<BlockData> allbools)
 	{
 		
@@ -307,19 +307,19 @@ public class ChunkGenerator : MonoBehaviour
 	static public bool CheckOutOfBounds(Vector3Int pos1)
 	{
 		//if you are checking out of bounds of the array return a
-		return (pos1.x < 0 || pos1.x >= Chunk._size.x ||
-			pos1.y < 0 || pos1.y >= Chunk._size.y ||
-			pos1.z < 0 || pos1.z >= Chunk._size.z);
+		return (pos1.x < 0 || pos1.x >= Chunk._size ||
+			pos1.y < 0 || pos1.y >= Chunk._size||
+			pos1.z < 0 || pos1.z >= Chunk._size);
 
 	}
 	static public int GetIndexFromPos(Vector3Int pos)
 	{
-		return (int)(pos.z + pos.y * Chunk._size.y + Chunk._size.x * Chunk._size.x * pos.x);
+		return (int)(pos.z + pos.y * Chunk._size + Chunk._size * Chunk._size * pos.x);
 
 	}
 	static public BlockData GetBlockFromPos(Vector3Int pos, List<BlockData> boolMap)
 	{
-		int index = (int)(pos.z + pos.y * Chunk._size.y + Chunk._size.x * Chunk._size.x * pos.x);
+		int index = (int)(pos.z + pos.y * Chunk._size + Chunk._size * Chunk._size * pos.x);
 		return boolMap[index];
 	}
 	#endregion
@@ -354,11 +354,11 @@ public class ChunkGenerator : MonoBehaviour
 		bd._on = false;
 		blocks[GetIndexFromPos(pos)] = bd;
 
-		for (int x = 0; x < Chunk._size.x; x++)
+		for (int x = 0; x < Chunk._size; x++)
 		{
-			for (int y = 0; y < Chunk._size.y; y++)
+			for (int y = 0; y < Chunk._size; y++)
 			{
-				for (int z = 0; z < Chunk._size.z; z++)
+				for (int z = 0; z < Chunk._size; z++)
 				{
 					pos.x = x; pos.y = y; pos.z = z;
 					bd = GetBlockFromPos(pos, blocks);

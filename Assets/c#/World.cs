@@ -28,8 +28,8 @@ public class World : MonoBehaviour {
 		if( !_ready){
 			return;
 		}
-		_chunkCtrl.Update (_player.transform.position);
-		_chunkCtrl.Draw ();
+		//_chunkCtrl.Update (_player.transform.position);
+		//_chunkCtrl.Draw ();
 
 	}
 	public bool Ready{

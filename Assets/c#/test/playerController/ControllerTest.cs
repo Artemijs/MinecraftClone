@@ -12,15 +12,15 @@ public class ControllerTest : MonoBehaviour {
 	public GameObject _targetIndicator;
 	bool _changedBlock = false;
 	bool _lock = false;
-	Main _main;
-
+	ChunkController _chunkCtrl;
+	BlockType _selectedType;
 	Vector3Int _targetPos;
 	Vector3 _cursorNormal;
 	void Start () {
 		//_targetIndicator = GameObject.Instantiate(_targetIndicator);
-		
+		_selectedType = BlockType.DIRT;
 		_camera = GameObject.Find ("Camera");
-		_main = GameObject.Find("Main").GetComponent<Main>();
+		_chunkCtrl = GameObject.Find("Main").GetComponent<ChunkController>();
 
 	}
 	// Update is called once per frame
@@ -35,19 +35,19 @@ public class ControllerTest : MonoBehaviour {
 	private void HandleMouseInput() {
 		if (Input.GetMouseButtonDown(0)) {
 			if(Vector3.Distance(transform.position, _targetIndicator.transform.position)< 5)
-				_main.CreateBlock(_targetIndicator.transform.position, _cursorNormal);
+				_chunkCtrl.CreateBlock(_targetIndicator.transform.position, _cursorNormal, _selectedType);
 		}
 		if (Input.GetMouseButton(1))
 		{
 			if (Vector3.Distance(transform.position, _targetIndicator.transform.position) < 5)
 			{
-				_main.StartDeletingBlock(_targetIndicator.transform.position, _cursorNormal);
+				_chunkCtrl.StartDeletingBlock(_targetIndicator.transform.position, _cursorNormal);
 				
 				//SetTargetBlockPos(_targetIndicator.transform.position, _cursorNormal);
 			}
 		}
 		if (Input.GetMouseButtonUp(1)) {
-			_main.CancelDeleting();
+			_chunkCtrl.CancelDeleting();
 		}
 	}
 	private void HandleInput(){
@@ -82,24 +82,48 @@ public class ControllerTest : MonoBehaviour {
 			}
 		}
 		gameObject.GetComponent<Rigidbody> ().velocity = playerDirf*speed;//
+		if (playerDirf != Vector3.zero) {
+			_chunkCtrl.SetCurrentChunk(transform.position);
+		}
 		if(!_lock)
 			if (playerDirf != Vector3.zero) {
 				_lock = true;
 				GetComponent<Rigidbody>().useGravity = true;
 			}
-
+		if (Input.GetKeyDown(KeyCode.Alpha1))
+		{
+			_selectedType = BlockType.DIRT;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha2))
+		{
+			_selectedType = BlockType.DIRT_GRASS;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha3))
+		{
+			_selectedType = BlockType.FROZEN_DIRT;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha4))
+		{
+			_selectedType = BlockType.FROZEN_ICE_DIRT;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha5))
+		{
+			_selectedType = BlockType.TREE_WOOD;
+		}
+		if (Input.GetKeyDown(KeyCode.Alpha5))
+		{
+			_selectedType = BlockType.ROCK;
+		}
 	}
 	void HandleTargetCursor() {
 		RaycastHit hitInfo;
 		if (Physics.Raycast(Camera.main.transform.position, Camera.main.transform.forward, out hitInfo, 100.0f))
 		{
-			Debug.Log("Hanppened");
 			_targetIndicator.transform.position = hitInfo.point;
 			_cursorNormal = hitInfo.normal;
 			
 		}
 		else {
-			Debug.Log("NEVER Hanppened");
 			_targetIndicator.transform.position = Vector3.zero;
 			_cursorNormal = Vector3.zero;
 		}

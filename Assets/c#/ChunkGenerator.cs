@@ -1,7 +1,9 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-
+/// <summary>
+/// this file assumes that every position provided is between 0 and Chunk._size
+/// </summary>
 public class ChunkGenerator : MonoBehaviour
 {
 	// Start is called before the first frame update
@@ -33,7 +35,7 @@ public class ChunkGenerator : MonoBehaviour
 			{
 				for (int z = 0; z < Chunk._size.z; z++)
 				{
-					bd._on = (y <= 0);
+					bd._on = (y + position .y<= 2);
 					if (!bd._on) bd._type = BlockType.AIR;
 					else {
 						bd._type = (BlockType)(Random.Range(0, 5));

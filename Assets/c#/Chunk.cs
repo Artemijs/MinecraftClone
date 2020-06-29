@@ -16,15 +16,15 @@ public struct BlockData
 };
 //List<int> lst = ints.OfType<int>().ToList(); // this isn't going to be fast.
 public class Chunk {
-	public static Vector3 _size = new Vector3 (10, 10, 10);
+	public static Vector3Int _size = new Vector3Int (5, 5, 5);
 	//Block[] _allBlocks;
-	Vector3 _position;
+	Vector3Int _position;
 	Mesh _mesh;
 	GameObject _collider;
 	List<BlockData> _allBlocks;
 	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider,
 		List<BlockData> blocks) {
-		_position = chunkPos;
+		_position = new Vector3Int( (int)chunkPos.x, (int)chunkPos.y, (int)chunkPos.z );
 		_mesh = mesh;
 		_collider = collider;
 		_allBlocks = blocks;
@@ -32,6 +32,7 @@ public class Chunk {
 
 	}
 	public void CreateCube(Vector3Int pos, BlockType type) {
+		pos -= _position;
 		ChunkGenerator.CreateCube(pos, type,  _mesh, _allBlocks);
 		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 	}
@@ -50,6 +51,7 @@ public class Chunk {
 		get { return _collider; }
 		set { _collider = value; }
 	}
+	public Vector3Int Position { get { return _position; }set { _position = value; } }
 
 
 
@@ -117,7 +119,7 @@ public class Chunk {
 		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;*/
 	}
 	public void SetChunkPos(Vector3 position){
-		_position = position;
+		//_position = position;
 	}
 
 	private void GetNeighbors(ref Block[] array, Vector3 position){
@@ -183,9 +185,7 @@ public class Chunk {
 	{
 		Graphics.DrawMesh(_mesh, _position, Quaternion.identity, mat, 0);
 	}
-	public void Draw(){
-		BlockFactory.Instance.Draw (_mesh, _position);
-	}
+	
 	public Block GetBlock(Vector3 position){
 
 		/*	position -= _position;

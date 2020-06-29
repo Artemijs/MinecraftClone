@@ -42,7 +42,7 @@ public class ChunkController: MonoBehaviour {
 			}
 		}*/
 		CreateSectors();
-		_currentSector = GetCurrentSector(Sector.F2IntVector(playerPos));
+		_currentSector = GetSectorFromPos(Sector.F2IntVector(playerPos));
 		SetCurrentChunk(playerPos);
 	}
 	public void CreateSectors() {
@@ -69,7 +69,7 @@ public class ChunkController: MonoBehaviour {
 	}
 	public void SetCurrentChunk(Vector3 playerPos) {
 		Vector3Int pPos = Sector.F2IntVector(playerPos);
-		Sector s = GetCurrentSector(pPos);
+		Sector s = GetSectorFromPos(pPos);
 		if (s != _currentSector)
 		{
 			_currentSector = s;
@@ -82,7 +82,7 @@ public class ChunkController: MonoBehaviour {
 		}
 
 	}
-	public Sector GetCurrentSector(Vector3Int pos) {
+	public Sector GetSectorFromPos(Vector3Int pos) {
 		for (int i = 0; i < _allSectors.Count; i++) {
 			if (_allSectors[i].CheckInside(pos)) {
 				return _allSectors[i];
@@ -134,7 +134,7 @@ public class ChunkController: MonoBehaviour {
 	}
 	public void CreateBlock(Vector3 pos, Vector3 normal, BlockType bType)
 	{
-		/*//get block pos
+		//get block pos
 		pos -= new Vector3(0.01f * normal.x, 0.01f * normal.y, 0.01f * normal.z);
 		BlockSide bs = ChunkGenerator.GetBlockSide(normal);
 		pos.x = (int)(pos.x);
@@ -147,11 +147,18 @@ public class ChunkController: MonoBehaviour {
 			_currentChunk.CreateCube(blockPos, bType);
 		else
 		{
-			Vector3Int cPos = GetIdFromPos(blockPos);
+			if (_currentSector.CheckInside(blockPos))
+			{
+				Chunk c = _currentSector.GetChunkFromPos(blockPos);
+				c.CreateCube(blockPos, bType);
+			}
+			else {
+				Sector s = GetSectorFromPos(blockPos);
+				Chunk c = s.GetChunkFromPos(blockPos);
+				c.CreateCube(blockPos, bType);
+			}
 
-			_chunks[cPos.x, cPos.y, cPos.z].CreateCube(blockPos, bType);
-
-		}	*/
+		}	
 	}
 	public bool CheckInCurrentChunk(Vector3Int pos) {
 		Vector3Int pso = _currentChunk.Position;
@@ -166,6 +173,7 @@ public class ChunkController: MonoBehaviour {
 		pos -= new Vector3(0.01f * normal.x, 0.01f * normal.y, 0.01f * normal.z);
 		BlockSide bs = ChunkGenerator.GetBlockSide(normal);
 		Vector3Int intPos = new Vector3Int((int)(pos.x), (int)(pos.y), (int)(pos.z));
+		//Vector3Int intPos = new Vector3Int(16, 2, 25);
 		if (intPos != _tbd._position)
 		{
 			_tbd._position = intPos;
@@ -177,9 +185,20 @@ public class ChunkController: MonoBehaviour {
 			CancelDeleting();
 		}
 		if (_tbd._deleting) return;
-		BlockData block = _currentChunk.GetBlockfromPos(intPos);
+		Debug.Log(intPos);
+		Sector s = _currentSector;
+		if (!_currentSector.CheckInside(intPos)) {
+			s = GetSectorFromPos(intPos);
+		}
+		Chunk c = _currentChunk;
+		if (!_currentChunk.CheckInside(intPos)) {
+			c = s.GetChunkFromPos(intPos);
+		}
+
+		BlockData block = c.GetBlockfromPos(intPos);
 
 		_tbd._deleting = true;
+		_tbd._targetChunk = c;
 		_tbd._position = intPos;
 		_tbd._toughness = ChunkGenerator.GetToughnessFromType(block._type);
 		_tbd._type = block._type;
@@ -197,17 +216,27 @@ public class ChunkController: MonoBehaviour {
 	}
 	void DeleteBlockInstantly()
 	{
-		
-		_currentChunk.DeleteCube(_tbd._position);
+		Sector s = _currentSector;
+		if (!_currentSector.CheckInside(_tbd._position))
+		{
+			s = GetSectorFromPos(_tbd._position);
+		}
+		Chunk c = _currentChunk;
+		if (!_currentChunk.CheckInside(_tbd._position))
+		{
+			_currentChunk = s.GetChunkFromPos(_tbd._position);
+		}
+
+		c.DeleteCube(_tbd._position);
 		
 	}
 	void DeleteBlock()
 	{
-		Debug.Log("DELETING");
+		//Debug.Log("DELETING");
 		_tbd._toughness -= Time.deltaTime;
 		if (_tbd._toughness <= 0)
 		{
-			_currentChunk.DeleteCube(_tbd._position);
+			_tbd._targetChunk.DeleteCube(_tbd._position);
 			_tbd._deleting = false;
 		}
 	}
@@ -317,10 +346,7 @@ public class Sector {
 		p.x = (int)(p.x / Chunk._size);
 		p.y = (int)(p.y / Chunk._size);
 		p.z = (int)(p.z / Chunk._size);
-		Debug.Log(_minPos + "  :  " + p);
-		if (pos.x > 4 || pos.x < 0) {
-			Debug.Log(p);
-		}
+		
 		return _chunks[p.x, p.y, p.z];
 	}
 	public static Vector3Int F2IntVector(Vector3 v) {
@@ -334,6 +360,7 @@ public struct TargetBlockData
 	public float _toughness;
 	public Vector3Int _position;
 	public BlockType _type;
+	public Chunk _targetChunk;
 	public Vector3 _breakPlaneAngle;
 	public Vector3 _breakPlanePos;
 	public Vector3 _targetNormal;

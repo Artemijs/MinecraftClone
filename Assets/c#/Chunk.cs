@@ -56,14 +56,21 @@ public class Chunk {
 	}
 	public void DeleteCube(Vector3Int pos)
 	{
+		pos -= _position;
 		//ChunkGenerator.Temp(pos, ref _mesh, ref _boolMap, ref _allBlocks);
 		ChunkGenerator.DeleteCube(pos, _mesh, _allBlocks);
 		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 		
 	}
 	public BlockData GetBlockfromPos(Vector3Int pos) {
+		pos -= _position;
 		int index = (int)(pos.z + pos.y * _size + _size * _size * pos.x);
 		return _allBlocks[index];
+	}
+	public bool CheckInside(Vector3Int pos) {
+		pos -= _position;
+		int index = (int)(pos.z + pos.y * _size + _size * _size * pos.x);
+		return (index > 0 && index < _allBlocks.Count);
 	}
 	public GameObject Collider {
 		get { return _collider; }

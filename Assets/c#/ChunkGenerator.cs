@@ -35,6 +35,8 @@ public class ChunkGenerator : MonoBehaviour
 			return;
 		}
 
+
+		TerrrainGen. SecondPass(_blocks);
 		CreateChunkMeshData();
 
 		CreateChunkMesh(out chunk);
@@ -51,6 +53,8 @@ public class ChunkGenerator : MonoBehaviour
 		_position = position;
 
 		int nrOfblocks = CreateChunkTypeData();
+
+		TerrrainGen.SecondPass(_blocks);
 
 		CreateChunkMeshData();
 
@@ -82,7 +86,7 @@ public class ChunkGenerator : MonoBehaviour
 				for (int z = 0; z < Chunk._size; z++)
 				{
 					bd._type = TerrrainGen.GetBlockType(_position + new Vector3(x, y, z));
-					bd._on = (bd._type != BlockType.AIR);
+					bd._on = (bd._type != BlockType.AIR && bd._type != BlockType.FROZEN_ICE_DIRT);
 					if (bd._on)
 					{
 						notAirCount++;
@@ -161,17 +165,19 @@ public class ChunkGenerator : MonoBehaviour
 	}
 	static public void AddUVSet( BlockType type, BlockSide side)
 	{
-		float s = 1 / 6.0f ;
-		s *= 1.01f;
+		float sx = 1 / 6.0f ;
+		float sy = 1 / 7.0f;
+		sx *= 1.01f;
+		sy *= 1.01f;
 		int x = (int)(side);
 		int y = (int)(type);
 		 float w = 0.95f;
 		
 		_uvs.AddRange(new Vector2[] {
-			new Vector2(((x + w) * s), 1-((y + w) * s)),
-			new Vector2(((x + w)) * s, 1-(y * s)),
-			new Vector2((x * s), 1-((y + w) * s) ),
-			new Vector2((x * s), 1-(y * s)),
+			new Vector2(((x + w) * sx), 1-((y + w) * sy)),
+			new Vector2(((x + w)) * sx, 1-(y * sy)),
+			new Vector2((x * sx), 1-((y + w) * sy) ),
+			new Vector2((x * sx), 1-(y * sy)),
 		});
 	}
 	static public void MakeTopPlane( Vector3Int pos)
@@ -389,7 +395,7 @@ public class ChunkGenerator : MonoBehaviour
 	public static void DeleteCube(Vector3Int pos,  Mesh mesh, List<BlockData> blocks)
 	{
 
-		/*List<Vector3> vertices = new List<Vector3>();
+		List<Vector3> vertices = new List<Vector3>();
 		List<Vector2> uvs = new List<Vector2>();
 		List<int> tris = new List<int>();
 
@@ -405,12 +411,12 @@ public class ChunkGenerator : MonoBehaviour
 				for (int z = 0; z < Chunk._size; z++)
 				{
 					pos.x = x; pos.y = y; pos.z = z;
-					bd = GetBlockFromPos(pos, blocks);
+					bd = GetBlockFromPos(pos);
 					if (bd._on)
 					{
 						//get neighbours 
-						BlockData[] nBlocks = GetNeighbours(pos, blocks);
-						MakeCubeMesh(nBlocks, bd._type, pos,  vertices,  tris,  uvs);
+						BlockData[] nBlocks = GetNeighbours(pos);
+						MakeCubeMesh(nBlocks, bd._type, pos);
 
 					}
 				}
@@ -425,7 +431,7 @@ public class ChunkGenerator : MonoBehaviour
 
 		//collider.GetComponent<MeshCollider>().sharedMesh = mesh;
 
-		//chunk = new Chunk(position, mesh, collider, blocks, boolMap);*/
+		//chunk = new Chunk(position, mesh, collider, blocks, boolMap);
 	}
 	public static BlockSide GetBlockSide(Vector3 normal) {
 		BlockSide bs = BlockSide.TOP;

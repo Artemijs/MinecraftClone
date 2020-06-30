@@ -19,10 +19,13 @@ public static class TerrrainGen
 
 	}
 	static Vector3 _worldSize;
-
+	static float _waterLevel;
+	static float _groundLevel;
 	public static void SetUp()
 	{
-		_worldSize = new Vector3(100, Chunk._size*Sector._cInSector, 100);//stupendous elavation
+		_worldSize = new Vector3(15, Chunk._size*Sector._cInSector, 15);//stupendous elavation
+		_waterLevel = (Chunk._size * Sector._cInSector )* 0.25f;
+		_groundLevel = (Chunk._size * Sector._cInSector) * 0.75f;
 	}
 	/// <summary>
 	/// the following is meant to produce a different terrain based on THE number, each is statement
@@ -34,86 +37,76 @@ public static class TerrrainGen
 	{
 
 		BlockType bt = BlockType.AIR;
-		float h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z));
-		h *= Sector._cInSector * Chunk._size;
-		if (pos.y > h)
+		float baseH = GetBaseHeight(pos);
+		float rockH = GetRockHeight(pos);
+		if (pos.y > baseH)
 		{
-			bt = BlockType.AIR;
+			if (pos.y <= _waterLevel) {
+				bt = BlockType.FROZEN_ICE_DIRT;
+			}
+			else 
+				bt = BlockType.AIR;
 		}
-		else
-			bt = BlockType.DIRT;
-		if (pos.y <= 2) return BlockType.DIRT_GRASS;
-		else return BlockType.AIR;
+		else {
+			if(pos.y >= rockH)
+				bt = BlockType.DIRT;
+			else
+				bt = BlockType.ROCK;
+
+		}
+			
+		//Debug.Log(Perlin.Noise(pos.x*100, pos.y*100, pos.z*100));
+		//if (pos.y <= 2) return BlockType.DIRT_GRASS;
+		//else return BlockType.AIR;
 		return bt;
 	}
-	private static float GetBaseHeight(Vector3 pos, PerlinType nr)
-	{
-		float h, h2, h3;
-
-		if (nr == PerlinType.TEST_LEVEL)
-		{
-			//varying max height
-			h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z)) * (_worldSize.y);//very smooth hills
-			h2 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.5f), pos.z / (_worldSize.z * 0.5f)) * (_worldSize.y);//smooth hills
-			h3 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.25f), pos.z / (_worldSize.z * 0.25f)) * (_worldSize.y * h);//hills
-			return h2 * 0.25f;
-		}
-		else if (nr == PerlinType.RAND_HEIGHT)
-		{
-			//varying max height
-			h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z));//very smooth hills
-			h2 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.5f), pos.z / (_worldSize.z * 0.5f)) * (_worldSize.y * h);//smooth hills
-			h3 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.25f), pos.z / (_worldSize.z * 0.25f)) * (_worldSize.y * h);//hills
-			return (h2 + h3) / 2;
-		}
-		else if (nr == PerlinType.NICE_AND_SMOOTH)
-		{
-			//nice and smooth with a touch of elavation changes
-			h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z)) * _worldSize.y * 1;//very smooth hills
-			h2 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.5f), pos.z / (_worldSize.z * 0.5f)) * (_worldSize.y * 1);//smooth hills
-			h3 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.25f), pos.z / (_worldSize.z * 0.25f)) * (_worldSize.y * 1);//hills
-			return (h + h2 + h3) / 3;
-		}
-		else if (nr == PerlinType.SUPER_ROUGH)
-		{
-			//super rough terrain
-			h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z)) * _worldSize.y * 1;//very smooth hills
-			h2 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.5f), pos.z / (_worldSize.z * 0.5f)) * (_worldSize.y * 1);//smooth hills
-			h3 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.25f), pos.z / (_worldSize.z * 0.25f)) * (_worldSize.y * 1);//hills
-			return (h + h2 + h3) / 3;
-		}
-		else if (nr == PerlinType.NOISY_HILLS)
-		{
-			//noisy hills
-			h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z)) * _worldSize.y * 0.125f;
-			h2 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.5f), pos.z / (_worldSize.z * 0.5f)) * (_worldSize.y * 0.25f);
-			h3 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.25f), pos.z / (_worldSize.z * 0.25f)) * (_worldSize.y);
-			return (h + h2 + h3);
-		}
-		else
-		{
-			//rough flat ground
-			h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z)) * _worldSize.y * 0.125f;
-			h2 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.5f), pos.z / (_worldSize.z * 0.5f)) * (_worldSize.y * 0.25f);
-			h3 = Mathf.PerlinNoise(pos.x / (_worldSize.x * 0.25f), pos.z / (_worldSize.z * 0.25f)) * (_worldSize.y);
-			return (h + h2 + h3) * 0.4f;
-		}
+	public static float GetBaseHeight(Vector3 pos) {
+		
+		float h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z));
+		h *= _groundLevel;
+		float h1 = Mathf.PerlinNoise(pos.x / (50), pos.z / (50));
+		h1 *= _groundLevel;
+		float h3 = Mathf.PerlinNoise(pos.x / (100), pos.z / (100));
+		h3 *= _groundLevel;
+		h = (h + h1 + h3) / 3;
+		return h;
 	}
-	private static BlockType Terraform(Vector3 pos)
+	public static float GetRockHeight(Vector3 pos)
 	{
-		BlockType bt = BlockType.AIR;
-		float h = GetBaseHeight(pos, PerlinType.NOISY_HILLS);
-		pos.x += 100;
-		pos.z += 100;
-		float h2 = GetBaseHeight(pos, PerlinType.NOISY_HILLS);
-		float size = _worldSize.y * 0.05f;
-		if (pos.y < h)
-		{
-			if (pos.y < h2 - size || pos.y > h2 + size)
+		pos += new Vector3(1125, -10, 1756);
+		float h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z));
+		h *= _groundLevel;
+		float h1 = Mathf.PerlinNoise(pos.x / (25), pos.z / (25));
+		h1 *= _groundLevel;
+		float h3 = Mathf.PerlinNoise(pos.x / (100), pos.z / (100));
+		h3 *= _groundLevel;
+		
+		return ((h + h1 + h3) / 3)-3;
+	}
+	public static void SecondPass(List<BlockData> blocks) {
+		//ChunkGenerator.GetNeighbours()
+		int index = 0;
+		for (int x = 0; x < Chunk._size; x++) {
+			for (int y = 0; y < Chunk._size; y++)
 			{
-				bt = BlockType.DIRT;
+				for (int z = 0; z < Chunk._size; z++)
+				{
+					//index = ChunkGenerator.GetIndexFromPos(new Vector3Int(x, y, z));
+					index = ChunkGenerator.GetIndexFromPos(new Vector3Int(x, y, z));
+					BlockData bd = blocks[index];
+					BlockData[] nBlocks = ChunkGenerator.GetNeighbours(new Vector3Int(x, y, z));
+
+					if (nBlocks[(int)BlockSide.TOP]._type == BlockType.AIR ) {
+
+						bd._type = BlockType.DIRT_GRASS;
+					}
+					if(y == Chunk._size - 1 && nBlocks[(int)BlockSide.BOTTOM]._type == BlockType.DIRT)
+						bd._type = BlockType.DIRT_GRASS;
+					blocks[index] = bd;
+
+				}
 			}
 		}
-		return bt;
 	}
+	
 }

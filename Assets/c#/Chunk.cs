@@ -18,6 +18,7 @@ public enum BlockType
 	TREE_WOOD,
 	FROZEN_DIRT,
 	FROZEN_ICE_DIRT,
+	WATER,
 	AIR,
 	GRASS
 };

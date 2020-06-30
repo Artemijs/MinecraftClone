@@ -6,28 +6,47 @@ using UnityEngine;
 /// </summary>
 public class ChunkGenerator : MonoBehaviour
 {
+	List<Vector3> _vertices;
+	List<Vector2> _uvs;
+	List<int> _tris;
+	List<BlockData> _blocks;
+	Vector3 _position;
+	Mesh _mesh;
+	int _nrOfCubes;
 	// Start is called before the first frame update
 	void Start()
 	{
-
+		_vertices = new List<Vector3>();
+		_uvs = new List<Vector2>();
+		_tris = new List<int>();
+		_blocks = new List<BlockData>();
+		_position = new Vector3();
+		_mesh = new Mesh();
+		_nrOfCubes = (int)(Chunk._size * Chunk._size * Chunk._size);
 	}
 
 	public void MakeChunk(out Chunk chunk, Vector3 position) {
-
-
-		GameObject collider = null;
-		int nrOfCubes = (int)(Chunk._size * Chunk._size * Chunk._size);
-		Mesh mesh = new Mesh();
-
-		List<Vector3> vertices = new List<Vector3>();
-		List<Vector2> uvs = new List<Vector2>();
-		List<int> tris = new List<int>();
-
-
-		List<BlockData> blocks = new List<BlockData>();
+		_position = position;
+		int notAirCount = CreateChunkTypeData();
+		if (notAirCount == 0) {
+			CreateChunkMesh(out chunk);
+			return;
+		}
+		CreateChunkMeshData();
+		CreateChunkMesh(out chunk);
+		ResetCache();
+	}
+	void ResetCache() {
+		_vertices.Clear();
+		_uvs.Clear();
+		_tris.Clear();
+		_blocks.Clear();
+		_position = new Vector3();
+		_mesh = new Mesh();
+	}
+	public int CreateChunkTypeData() {
 		BlockData bd;
-		int index = 0;
-
+		int notAirCount = 0;
 		//create a bool map
 		for (int x = 0; x < Chunk._size; x++)
 		{
@@ -35,20 +54,21 @@ public class ChunkGenerator : MonoBehaviour
 			{
 				for (int z = 0; z < Chunk._size; z++)
 				{
-					bd._type = TerrrainGen.GetBlockType(position + new Vector3(x, y, z));
+					bd._type = TerrrainGen.GetBlockType(_position + new Vector3(x, y, z));
 					bd._on = (bd._type != BlockType.AIR);
-					//bd._on = (y + position.y<= 2);
-					/*if (!bd._on) bd._type = BlockType.AIR;
-					else {
-						bd._type = (BlockType)(Random.Range(0, 5));
-					}*/
-					blocks.Add(bd);
-					index++;
+					if (bd._on)
+					{
+						notAirCount++;
+					}
+					_blocks.Add(bd);
 				}
 			}
 		}
+		return notAirCount;
+	}
+	public void CreateChunkMeshData() {
+		BlockData bd;
 		Vector3Int pos = new Vector3Int();
-		index = 0;
 		for (int x = 0; x < Chunk._size; x++)
 		{
 			for (int y = 0; y < Chunk._size; y++)
@@ -56,30 +76,32 @@ public class ChunkGenerator : MonoBehaviour
 				for (int z = 0; z < Chunk._size; z++)
 				{
 					pos.x = x; pos.y = y; pos.z = z;
-					bd = GetBlockFromPos(pos, blocks);
+					bd = GetBlockFromPos(pos, _blocks);
 					if (bd._on)
 					{
 						//get neighbours 
-						BlockData[] nBlocks = GetNeighbours(pos, blocks);
-						MakeCubeMesh(nBlocks, bd._type, pos,  vertices,  tris,  uvs);
-						index++;
+						BlockData[] nBlocks = GetNeighbours(pos, _blocks);
+						MakeCubeMesh(nBlocks, bd._type, pos, _vertices, _tris, _uvs);
 					}
 				}
 			}
 		}
-		mesh.vertices = vertices.ToArray();
-		mesh.uv = uvs.ToArray();
-		mesh.triangles = tris.ToArray();
+	}
+	public void CreateChunkMesh(out Chunk chunk) {
+		GameObject collider = null;
+		_mesh.vertices = _vertices.ToArray();
+		_mesh.uv = _uvs.ToArray();
+		_mesh.triangles = _tris.ToArray();
 		//_mesh.normals = normals;
-		mesh.RecalculateNormals();
+		_mesh.RecalculateNormals();
 		if (collider == null)
 			collider = new GameObject();
-		collider.transform.position = position;
+		collider.transform.position = _position;
+		//MeshCollider mc = new MeshCollider();
 		collider.AddComponent<MeshCollider>();
-		collider.GetComponent<MeshCollider>().sharedMesh = mesh;
+		collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 
-		chunk = new Chunk(position, mesh, collider, blocks);
-		
+		chunk = new Chunk(_position, _mesh, collider, _blocks);
 	}
 	#region make cude code
 	static public void MakeCubeMesh(BlockData[] nBlocks, BlockType type, Vector3Int pos,  List<Vector3> verts,  List<int> tris,  List<Vector2> uvs)

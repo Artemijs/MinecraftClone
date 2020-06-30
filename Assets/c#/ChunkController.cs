@@ -470,7 +470,8 @@ public class Sector {
 				for (int z = 0; z < _cInSector; z++)
 				{
 					_chunks[x, y, z].Position = _minPos + new Vector3Int(x * size, y * size, z * size);
-					_chunks[x, y, z].Collider.transform.position = _minPos + new Vector3Int(x * size, y * size, z * size);
+					_chunkGen.MakeChunk(out _chunks[x, y, z], _minPos + new Vector3Int(x * size, y * size, z * size));
+					//_chunks[x, y, z].Collider.transform.position = _minPos + new Vector3Int(x * size, y * size, z * size);
 				}
 			}
 		}

@@ -35,12 +35,13 @@ public class ChunkGenerator : MonoBehaviour
 			{
 				for (int z = 0; z < Chunk._size; z++)
 				{
-					bd._on = (y + position.y<= 2);
-					if (!bd._on) bd._type = BlockType.AIR;
+					bd._type = TerrrainGen.GetBlockType(position + new Vector3(x, y, z));
+					bd._on = (bd._type != BlockType.AIR);
+					//bd._on = (y + position.y<= 2);
+					/*if (!bd._on) bd._type = BlockType.AIR;
 					else {
 						bd._type = (BlockType)(Random.Range(0, 5));
-					}
-					//bd._on = (y == 0 && x == 0 && z == 0);
+					}*/
 					blocks.Add(bd);
 					index++;
 				}
@@ -398,10 +399,10 @@ public class ChunkGenerator : MonoBehaviour
 	public static float GetToughnessFromType(BlockType type) {
 		//time it takes to break the block IN SECONMDS
 		float toughness = 0;
-		if (type == BlockType.DIRT || type == BlockType.DIRT_GRASS) toughness = 1.25f;
-		else if (type == BlockType.FROZEN_DIRT || type == BlockType.FROZEN_ICE_DIRT) toughness = 1.25f;
-		else if (type == BlockType.TREE_WOOD) toughness = 1.25f;
-		else if (type == BlockType.ROCK) toughness = 1.75f;
+		if (type == BlockType.DIRT || type == BlockType.DIRT_GRASS) toughness = 0.01f;
+		else if (type == BlockType.FROZEN_DIRT || type == BlockType.FROZEN_ICE_DIRT) toughness = 0.01f;
+		else if (type == BlockType.TREE_WOOD) toughness = 0.01f;
+		else if (type == BlockType.ROCK) toughness = 0.01f;
 		else toughness = 1.15f;
 		return toughness;
 	}

@@ -12,13 +12,10 @@ public class ChunkController: MonoBehaviour {
 	Sector _currentSector;
 	public GameObject _blockBreakPlane;
 	public Material _blockMaterial;
-	//I PITY THE FOOL THAT READS THIS
-	//U FUUKING KNEW ID HAV E TO READ THIS U CUNT 
-	//sList<Sector> _allSectors;
 	List<List<Sector>> _allSectors;
 	private void Start()
 	{
-		
+		TerrrainGen.SetUp();
 		Sector._chunkGen = GetComponent<ChunkGenerator>();
 		//xyz
 		_allSectors = new List<List<Sector>>();
@@ -68,21 +65,17 @@ public class ChunkController: MonoBehaviour {
 			}
 		}
 	}
-	public void SetCurrentChunk(Vector3 playerPos) {
+	public void CheckChunkChanged(Vector3 playerPos) {
 		Vector3Int pPos = Sector.F2IntVector(playerPos);
-		if (_currentChunk.CheckInside(pPos)) return;
 
-		Sector s = GetSectorFromPos(pPos);
-		if (s != _currentSector)
-		{
+		if(!_currentSector.CheckInside(pPos)){
+			Sector s = GetSectorFromPos(pPos);
 			MovedSectors(s);
 			_currentSector = s;
 		}
-		Chunk chunk = _currentSector.GetChunkFromPos(pPos);
-		if (_currentChunk != chunk) {
-			_currentChunk = chunk;
+		if (!_currentChunk.CheckInside(pPos)) {
+			_currentChunk = _currentSector.GetChunkFromPos(pPos);
 		}
-
 	}
 	public void MovedSectors(Sector newSect) {
 		//fiind direction moved in
@@ -396,7 +389,7 @@ public class ChunkController: MonoBehaviour {
 }
 
 public class Sector {
-	static int _cInSector = 4;
+	public static int _cInSector = 4;
 	public static ChunkGenerator _chunkGen;
 	Vector3Int _minPos;
 	static int _size;

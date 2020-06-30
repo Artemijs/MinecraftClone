@@ -84,7 +84,7 @@ public class ControllerTest : MonoBehaviour {
 		}
 		gameObject.GetComponent<Rigidbody> ().velocity = playerDirf*speed;//
 		if (playerDirf != Vector3.zero) {
-			_chunkCtrl.SetCurrentChunk(transform.position);
+			_chunkCtrl.CheckChunkChanged(transform.position);
 		}
 		if(!_lock)
 			if (playerDirf != Vector3.zero) {

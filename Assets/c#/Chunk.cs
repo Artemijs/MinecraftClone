@@ -20,8 +20,6 @@ public enum BlockType
 	FROZEN_ICE_DIRT,
 	AIR,
 	GRASS
-
-
 };
 public struct BlockData
 {

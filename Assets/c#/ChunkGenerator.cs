@@ -11,7 +11,6 @@ public class ChunkGenerator : MonoBehaviour
 	static List<int> _tris;
 	static List<BlockData> _blocks;
 	static Vector3 _position;
-	static Mesh _mesh;
 	static int _nrOfCubes;
 	// Start is called before the first frame update
 	void Start()
@@ -21,21 +20,25 @@ public class ChunkGenerator : MonoBehaviour
 		_tris = new List<int>();
 		_blocks = new List<BlockData>();
 		_position = new Vector3();
-		_mesh = new Mesh();
 		_nrOfCubes = (int)(Chunk._size * Chunk._size * Chunk._size);
 	}
 
 	public static void MakeChunk(out Chunk chunk, Vector3 position) {
 
 		_position = position;
+
 		int nrOfblocks = CreateChunkTypeData();
+
 		if (nrOfblocks == 0) {
 			QuickCreateChunkMesh(out chunk);
 			ResetCache();
 			return;
 		}
+
 		CreateChunkMeshData();
+
 		CreateChunkMesh(out chunk);
+
 		ResetCache();
 
 	}
@@ -44,13 +47,29 @@ public class ChunkGenerator : MonoBehaviour
 	else {
 		bd._type = (BlockType)(Random.Range(0, 5));
 	}*/
+	public static void RemakeChunk(Chunk chunk, Vector3 position) {
+		_position = position;
+
+		int nrOfblocks = CreateChunkTypeData();
+
+		CreateChunkMeshData();
+
+		chunk.Position = Sector.F2IntVector(_position);
+		chunk.MeshObj.vertices = _vertices.ToArray();
+		chunk.MeshObj.uv = _uvs.ToArray();
+		chunk.MeshObj.triangles = _tris.ToArray();
+		chunk.MeshObj.RecalculateNormals();
+		chunk.RecalculateCollider();
+
+		ResetCache();
+
+	}
 	static void ResetCache() {
 		_vertices.Clear();
 		_uvs.Clear();
 		_tris.Clear();
-		_blocks.Clear();
+		_blocks = new List<BlockData>();
 		_position = new Vector3();
-		_mesh = new Mesh();
 	}
 	public static int CreateChunkTypeData() {
 		BlockData bd;
@@ -96,27 +115,15 @@ public class ChunkGenerator : MonoBehaviour
 		}
 	}
 	public static void QuickCreateChunkMesh(out Chunk chunk) {
-		GameObject collider = null;
-		if (collider == null)
-			collider = new GameObject();
-		collider.transform.position = _position;
-		chunk = new Chunk(_position, _mesh, collider, _blocks);
+		chunk = new Chunk(_position, _blocks);
 	}
 	public static void CreateChunkMesh(out Chunk chunk) {
-		GameObject collider = null;
-		_mesh.vertices = _vertices.ToArray();
-		_mesh.uv = _uvs.ToArray();
-		_mesh.triangles = _tris.ToArray();
-		//_mesh.normals = normals;
-		_mesh.RecalculateNormals();
-		if (collider == null)
-			collider = new GameObject();
-		collider.transform.position = _position;
-		//MeshCollider mc = new MeshCollider();
-		collider.AddComponent<MeshCollider>();
-		collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
-
-		chunk = new Chunk(_position, _mesh, collider, _blocks);
+		chunk = new Chunk(_position, _blocks);
+		chunk.MeshObj.vertices = _vertices.ToArray();
+		chunk.MeshObj.uv = _uvs.ToArray();
+		chunk.MeshObj.triangles = _tris.ToArray();
+		chunk.MeshObj.RecalculateNormals();
+		chunk.RecalculateCollider();
 	}
 	#region make cude code
 	static public void MakeCubeMesh(BlockData[] nBlocks, BlockType type, Vector3Int pos)
@@ -308,9 +315,7 @@ public class ChunkGenerator : MonoBehaviour
 	}*/
 	static public BlockData[] GetNeighbours(Vector3Int pos)
 	{
-		
-		if(pos.x == 4)
-			Debug.Log(pos);
+
 		int i = 0;
 		BlockData[] bData = new BlockData[6];
 		Vector3Int nPos = pos + new Vector3Int(-1, 0, 0);//left
@@ -363,22 +368,23 @@ public class ChunkGenerator : MonoBehaviour
 	#endregion
 	public static void CreateCube(Vector3Int pos, BlockType type, Mesh mesh, List<BlockData> blocks)
 	{
-		/*List<Vector3> _vertices = new List<Vector3>(mesh.vertices);
-		List<Vector2> uvs = new List<Vector2>(mesh.uv);
-		List<int> tris = new List<int>(mesh.triangles);
-
-		BlockData bd = blocks[GetIndexFromPos(pos)];
+		_vertices = new List<Vector3>(mesh.vertices);
+		_uvs = new List<Vector2>(mesh.uv);
+		_tris = new List<int>(mesh.triangles);
+		_blocks = blocks;
+		int index = GetIndexFromPos(pos);
+		BlockData bd = _blocks[index];
 		bd._on = true;
 		bd._type = type;
-		blocks[GetIndexFromPos(pos)] = bd;
+		_blocks[index] = bd;
 
-		ChunkGenerator.MakeCubeMesh(ChunkGenerator.GetNeighbours(pos, blocks), bd._type,
-			pos, _vertices,  tris,  uvs);
+		ChunkGenerator.MakeCubeMesh(ChunkGenerator.GetNeighbours(pos), bd._type, pos);
 		mesh.vertices = _vertices.ToArray();
-		mesh.uv = uvs.ToArray();
-		mesh.triangles = tris.ToArray();
+		mesh.uv = _uvs.ToArray();
+		mesh.triangles = _tris.ToArray();
 		//_mesh.normals = normals;
-		mesh.RecalculateNormals();*/
+		mesh.RecalculateNormals();
+		ResetCache();
 	}
 	public static void DeleteCube(Vector3Int pos,  Mesh mesh, List<BlockData> blocks)
 	{

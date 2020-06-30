@@ -470,8 +470,9 @@ public class Sector {
 				{
 					_chunks[x, y, z].Position = _minPos + new Vector3Int(x * size, y * size, z * size);
 
-					GameObject.Destroy(_chunks[x, y, z].Collider);
-					TerrainGenQue.Add2Que(_chunks[x, y, z], _chunks[x, y, z].Position);
+					//GameObject.Destroy(_chunks[x, y, z].Collider);
+					_chunks[x, y, z].Clear();
+					TerrainGenQue.Add2Que(_chunks[x, y, z], _minPos + new Vector3Int(x * size, y * size, z * size));
 					//ChunkGenerator.MakeChunk(out _chunks[x, y, z], _minPos + new Vector3Int(x * size, y * size, z * size));
 					//_chunks[x, y, z].Collider.transform.position = _minPos + new Vector3Int(x * size, y * size, z * size);
 				}

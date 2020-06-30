@@ -34,7 +34,7 @@ public static class TerrrainGen
 	{
 
 		BlockType bt = BlockType.AIR;
-		float h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z));//very smooth hills
+		float h = Mathf.PerlinNoise(pos.x / (_worldSize.x), pos.z / (_worldSize.z));
 		h *= Sector._cInSector * Chunk._size;
 		if (pos.y > h)
 		{
@@ -42,8 +42,8 @@ public static class TerrrainGen
 		}
 		else
 			bt = BlockType.DIRT;
-		//if (pos.y <= 2) return BlockType.DIRT_GRASS;
-		//else return BlockType.AIR;
+		if (pos.y <= 2) return BlockType.DIRT_GRASS;
+		else return BlockType.AIR;
 		return bt;
 	}
 	private static float GetBaseHeight(Vector3 pos, PerlinType nr)

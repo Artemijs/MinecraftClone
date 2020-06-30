@@ -32,16 +32,25 @@ public class Chunk {
 	//Block[] _allBlocks;
 	Vector3Int _position;
 	Mesh _mesh;
-	GameObject _collider;
+	GameObject _collider = null;
 	List<BlockData> _allBlocks;
-	public Chunk(Vector3 chunkPos, Mesh mesh, GameObject collider,
-		List<BlockData> blocks) {
+	public Chunk(Vector3 chunkPos, List<BlockData> blocks) {
 		_position = new Vector3Int( (int)chunkPos.x, (int)chunkPos.y, (int)chunkPos.z );
-		_mesh = mesh;
-		_collider = collider;
+		_mesh = new Mesh();
+		//_collider = collider;
 		_allBlocks = blocks;
-		//_boolMap = bools;
+		_collider = new GameObject();
+		_collider.transform.position = _position;
+		_collider.AddComponent<MeshCollider>();
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 
+
+	}
+	public void RecalculateCollider() {
+		if(_collider == null)
+			_collider = new GameObject();
+		_collider.transform.position = _position;
+		_collider.GetComponent<MeshCollider>().sharedMesh = _mesh;
 	}
 	public void Draw(Material mat)
 	{
@@ -73,6 +82,15 @@ public class Chunk {
 	public GameObject Collider {
 		get { return _collider; }
 		set { _collider = value; }
+	}
+	public void Clear() {
+		//GameObject.Destroy(_collider);
+		//_collider = null;
+		_mesh.Clear();
+	}
+	public Mesh MeshObj {
+		get { return _mesh; }
+		set { _mesh = value; }
 	}
 	public Vector3Int Position { get { return _position; }set { _position = value; } }
 }

@@ -4,15 +4,15 @@ using UnityEngine;
 using System;
 public class TerrainGenQue : MonoBehaviour
 {
-	public delegate void MakeChunkAction<T1, T2>(out T1 a, T2 b);
-	static MakeChunkAction< Chunk, Vector3> _makeChunkAction;
+	public delegate void MakeChunkAction<T1, T2>( T1 a, T2 b);
+	static MakeChunkAction< Chunk, Vector3> _remakeChunkAction;
 	static List<Pair<Chunk, Vector3Int>> _mcaQueParameters;
 	public int _actionsPerFrame;
     // Start is called before the first frame update
     void Start()
     {
 		_mcaQueParameters = new List<Pair<Chunk, Vector3Int>>();
-		_makeChunkAction = ChunkGenerator.MakeChunk;
+		_remakeChunkAction = ChunkGenerator.RemakeChunk;
 
 	}
 
@@ -22,9 +22,10 @@ public class TerrainGenQue : MonoBehaviour
 		if (_mcaQueParameters.Count <= 0) return;
 		int len = getActionsPerFrameVar();
 		for (int i = 0; i < len; i++) {
-			_makeChunkAction.Invoke(out _mcaQueParameters[i].one, _mcaQueParameters[i].two);
+			_remakeChunkAction.Invoke( _mcaQueParameters[i].one, _mcaQueParameters[i].two);
 		}
 		_mcaQueParameters.RemoveRange(0, len);
+		Debug.Log(_mcaQueParameters.Count);
     }
 	int getActionsPerFrameVar() {
 		if (_mcaQueParameters.Count < _actionsPerFrame)

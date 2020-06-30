@@ -276,7 +276,6 @@ public class ChunkController: MonoBehaviour {
 			CancelDeleting();
 		}
 		if (_tbd._deleting) return;
-		Debug.Log(intPos);
 		Sector s = _currentSector;
 		if (!_currentSector.CheckInside(intPos)) {
 			s = GetSectorFromPos(intPos);
@@ -417,7 +416,7 @@ public class Sector {
 			{
 				for (int z = 0; z < _cInSector; z++)
 				{
-					_chunkGen.MakeChunk(out _chunks[x, y, z], _minPos + new Vector3Int(x * size, y * size, z * size));
+					ChunkGenerator.MakeChunk(out _chunks[x, y, z], _minPos + new Vector3Int(x * size, y * size, z * size));
 				}
 			}
 		}
@@ -470,7 +469,10 @@ public class Sector {
 				for (int z = 0; z < _cInSector; z++)
 				{
 					_chunks[x, y, z].Position = _minPos + new Vector3Int(x * size, y * size, z * size);
-					_chunkGen.MakeChunk(out _chunks[x, y, z], _minPos + new Vector3Int(x * size, y * size, z * size));
+
+					GameObject.Destroy(_chunks[x, y, z].Collider);
+					TerrainGenQue.Add2Que(_chunks[x, y, z], _chunks[x, y, z].Position);
+					//ChunkGenerator.MakeChunk(out _chunks[x, y, z], _minPos + new Vector3Int(x * size, y * size, z * size));
 					//_chunks[x, y, z].Collider.transform.position = _minPos + new Vector3Int(x * size, y * size, z * size);
 				}
 			}

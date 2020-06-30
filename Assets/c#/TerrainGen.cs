@@ -42,6 +42,8 @@ public static class TerrrainGen
 		}
 		else
 			bt = BlockType.DIRT;
+		//if (pos.y <= 2) return BlockType.DIRT_GRASS;
+		//else return BlockType.AIR;
 		return bt;
 	}
 	private static float GetBaseHeight(Vector3 pos, PerlinType nr)

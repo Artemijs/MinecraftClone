@@ -89,7 +89,7 @@ public class ControllerTest : MonoBehaviour {
 		if(!_lock)
 			if (playerDirf != Vector3.zero) {
 				_lock = true;
-				GetComponent<Rigidbody>().useGravity = true;
+				//GetComponent<Rigidbody>().useGravity = true;
 			}
 		if (Input.GetKeyDown(KeyCode.Alpha1))
 		{

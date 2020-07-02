@@ -21,11 +21,13 @@ public static class TerrrainGen
 	static Vector3 _worldSize;
 	static float _waterLevel;
 	static float _groundLevel;
+	static List<BlockData> _blocks;
 	public static void SetUp()
 	{
 		_worldSize = new Vector3(15, Chunk._size*Sector._cInSector, 15);//stupendous elavation
 		_waterLevel = (Chunk._size * Sector._cInSector )* 0.25f;
 		_groundLevel = (Chunk._size * Sector._cInSector) * 0.75f;
+		_blocks = new List<BlockData>();
 	}
 	/// <summary>
 	/// the following is meant to produce a different terrain based on THE number, each is statement
@@ -84,29 +86,102 @@ public static class TerrrainGen
 		return ((h + h1 + h3) / 3)-3;
 	}
 	public static void SecondPass(List<BlockData> blocks) {
-		//ChunkGenerator.GetNeighbours()
+		_blocks = blocks;
 		int index = 0;
+		bool tree = false;
+		Vector3Int blockPos = new Vector3Int();
 		for (int x = 0; x < Chunk._size; x++) {
 			for (int y = 0; y < Chunk._size; y++)
 			{
 				for (int z = 0; z < Chunk._size; z++)
 				{
+					blockPos = new Vector3Int(x, y, z);
 					//index = ChunkGenerator.GetIndexFromPos(new Vector3Int(x, y, z));
-					index = ChunkGenerator.GetIndexFromPos(new Vector3Int(x, y, z));
+					index = ChunkGenerator.GetIndexFromPos(blockPos);
 					BlockData bd = blocks[index];
-					BlockData[] nBlocks = ChunkGenerator.GetNeighbours(new Vector3Int(x, y, z));
+					BlockData[] nBlocks = ChunkGenerator.GetNeighbours(blockPos);
 
 					if (nBlocks[(int)BlockSide.TOP]._type == BlockType.AIR ) {
 
 						bd._type = BlockType.DIRT_GRASS;
+						if (IsTree(blockPos) && !tree && nBlocks[(int)BlockSide.BOTTOM]._type == BlockType.DIRT_GRASS)
+						{
+							tree = true;
+							CreateTree(blockPos);
+						}
 					}
-					if(y == Chunk._size - 1 && nBlocks[(int)BlockSide.BOTTOM]._type == BlockType.DIRT)
-						bd._type = BlockType.DIRT_GRASS;
+					//if(y == Chunk._size - 1 && nBlocks[(int)BlockSide.BOTTOM]._type == BlockType.DIRT)
+					//	bd._type = BlockType.DIRT_GRASS;
 					blocks[index] = bd;
+					
 
 				}
 			}
 		}
 	}
-	
+	public static void CreateTree(Vector3Int blockPos)
+	{
+		BlockData bd;
+		int index = 0;
+		
+		for (int y = 0; y < 5; y++) {
+			
+			blockPos.y++;
+			
+			index = ChunkGenerator.GetIndexFromPos(blockPos);
+			if (index >= _blocks.Count) break;
+			bd = _blocks[index];
+			bd._type = BlockType.TREE_WOOD;
+			bd._on = true;
+			_blocks[index] = bd;
+			if (y > 1) CreateTreeLeaves(blockPos);
+		}
+	}
+	public static void CreateTreeLeaves(Vector3Int pos) {
+		BlockData bd;
+		int index = 0;
+		Vector3Int startPos = pos - new Vector3Int(2, 0, 2);
+		for (; startPos.x < pos.x + 2; startPos.x++) {
+			for (; startPos.z < pos.z + 2; startPos.z++)
+			{
+				if (startPos == pos) continue;
+				if (startPos.x < 0) startPos.x = 0;
+				if (startPos.z < 0) startPos.z = 0;
+				index = ChunkGenerator.GetIndexFromPos(startPos);
+				if (index >= _blocks.Count) continue;
+				if (index < 0) continue;
+
+				bd = _blocks[index];
+				bd._type = BlockType.TREE_LEAVES;
+				bd._on = true;
+				_blocks[index] = bd;
+			}
+		}
+
+		//create plane (start pos, end pos, type)
+		//create block (start pos, end pos, type)
+		//create line R(pos, len)
+		//getLineR(pos, len, xyz)
+		//
+	}
+	public static bool IsTree(Vector3Int blockPos) {
+		//float treeChance = Mathf.PerlinNoise((blockPos.x+Random.Range(-100,100))/25.0f, blockPos.z/25.0f)*10;
+		//return (treeChance > 5);
+		return (blockPos.x == 2 && blockPos.z == 2);
+		//CheckNeighboursRecursively(0, BlockType.TREE_WOOD, blockPos);
+
+	}
+	public static void CheckNeighboursRecursively(int distance, BlockType bt, Vector3Int blockPos) {
+
+		distance++;
+		//get block (block pos)
+		//check if block is of bt.type
+		BlockData[] nBlocks = ChunkGenerator.GetNeighbours(blockPos);
+		//CheckNeighboursRecursively(distance, bt, nBlocks[(int)BlockSide.LEFT]._position);
+		//CheckNeighboursRecursively(distance, bt, nBlocks[(int)BlockSide.RIGHT]._position);
+		//CheckNeighboursRecursively(distance, bt, nBlocks[(int)BlockSide.FORWARD]._position);
+		//CheckNeighboursRecursively(distance, bt, nBlocks[(int)BlockSide.BACKWARD]._position);
+
+	}
+
 }

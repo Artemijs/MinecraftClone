@@ -166,7 +166,7 @@ public class ChunkGenerator : MonoBehaviour
 	static public void AddUVSet( BlockType type, BlockSide side)
 	{
 		float sx = 1 / 6.0f ;
-		float sy = 1 / 7.0f;
+		float sy = 1 / 8.0f;
 		sx *= 1.01f;
 		sy *= 1.01f;
 		int x = (int)(side);

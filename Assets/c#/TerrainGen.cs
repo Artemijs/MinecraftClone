@@ -86,10 +86,10 @@ namespace Version3_1 {
 				for (int z = 0; z < Sector._suSize; z++) {
 					
 					int y = sPos.y+Sector._suSize-1;
-					BlockData bd = s.Parent.GetBlock(sPos + new Vector3Int(x, y, z));
+					BlockData bd = s.GetBlock(sPos + new Vector3Int(x, y, z));
 					while (bd.Type != BlockType.DIRT) {
 						y--;
-						bd = s.Parent.GetBlock(sPos + new Vector3Int(x, y, z));
+						bd = s.GetBlock(sPos + new Vector3Int(x, y, z));
 						if (bd == null || y <=0)
 							break;
 					}

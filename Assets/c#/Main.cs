@@ -21,11 +21,12 @@ namespace Version3_1 {
 
 		// Start is called before the first frame update
 		void Start() {
+			Vector3Int pPos = StaticFunctions.Vector3F2Int(_player.position);
 
-			Vector3 pPos = new Vector3(0, 0, 0);
-			_map = new Node(pPos, Vector3Int.zero, 3, 0, null);
-			BlockData bd = _map.GetBlock(StaticFunctions.Vector3F2Int(pPos));
-			_current = (Sector)(_map.GetCurrent(10, 0, StaticFunctions.Vector3F2Int(pPos)));
+			pPos.y = 0;
+			_map = new Node(_player.position, new Vector3Int(-1000, -1000, -1000), StaticFunctions._maxDepth, 0, null);
+			BlockData bd = _map.GetBlock(pPos);
+			_current = (Sector)(_map.Search(10, 0, pPos));
 			_current.InitBlockData();
 			Debug.Log(bd.Type);
 			MeshGenerator.GenerateMesh(_current);
@@ -38,17 +39,27 @@ namespace Version3_1 {
 		void Update() {
 
 			_map.Draw(_material);
-			if ( !_current.IsInside(StaticFunctions.Vector3F2Int(_player.position))) {
-				Sector s  = (Sector)_current.Parent.GetCurrent(10, 0, StaticFunctions.Vector3F2Int(_player.position));
-				if (s == null) {
-					_current = (Sector)_current.Parent.CreateOne(_current.Position, new Vector3Int(1, 0, 0));
-					
-				}
-			}
+			CheckPlayerMoved();
 			HandleInput();
 
 		}
+		void CheckPlayerMoved() {
+			if (!_current.IsInside(StaticFunctions.Vector3F2Int(_player.position))) {
+				Node n = _current.Parent.Parent.Search(10, 0, StaticFunctions.Vector3F2Int(_player.position));
+				if (n != null) {
+					_current = (Sector)n;
+					return;
+				}
+				//Vector3Int dir = GetDir(_current.Position, StaticFunctions.Vector3F2Int(_player.position));
+				Sector s = (Sector)_current.CreateNextFromPos(StaticFunctions.Vector3F2Int(_player.position));
+				s.InitBlockData();
+				MeshGenerator.GenerateMesh(s);
+				_current = s;
+			}
+		}
+		
 		void HandleInput() {
+
 		}
 
 	}

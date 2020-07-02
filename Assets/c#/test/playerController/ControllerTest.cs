@@ -52,7 +52,7 @@ public class ControllerTest : MonoBehaviour {
 		}
 	}
 	private void HandleInput(){
-		transform.position += new Vector3(0.5f, 0, 0);
+		//transform.position += new Vector3(0, 0, 0.5f);
 		float speed = 8;
 		Vector3 playerDirf = Vector3.zero;
 		if (Input.GetKey (KeyCode.W)) {
@@ -84,13 +84,11 @@ public class ControllerTest : MonoBehaviour {
 			}
 		}
 		gameObject.GetComponent<Rigidbody> ().velocity = playerDirf*speed;//
-		if (playerDirf != Vector3.zero) {
-			_chunkCtrl.CheckChunkChanged(transform.position);
-		}
+		
 		if(!_lock)
 			if (playerDirf != Vector3.zero) {
 				_lock = true;
-				//GetComponent<Rigidbody>().useGravity = true;
+				GetComponent<Rigidbody>().useGravity = true;
 			}
 		if (Input.GetKeyDown(KeyCode.Alpha1))
 		{

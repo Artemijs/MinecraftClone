@@ -24,7 +24,7 @@ public class MapData : MonoBehaviour
 			Vector3 pPos = new Vector3(0, 0, 0);
 			_map = new Node(pPos, Vector3Int.zero, 3, 0, null);
 			BlockData bd = _map.GetBlock(StaticFunctions.Vector3F2Int(pPos));
-			Sector current = (Sector)(_map.GetCurrent(10, 0, StaticFunctions.Vector3F2Int(pPos)));
+			Sector current = (Sector)(_map.Search(10, 0, StaticFunctions.Vector3F2Int(pPos)));
 			_map.InitBlockData();
 			Debug.Log(bd.Type);
 			MeshGenerator.GenerateMesh(current);
@@ -68,6 +68,7 @@ public class MapData : MonoBehaviour
 					}
 				}
 			}
+			_depth = 666;
 			CreateBlockData();
 		}
 		private void CreateBlockData() {
@@ -91,7 +92,7 @@ public class MapData : MonoBehaviour
 			return _blockData[pos.x, pos.y, pos.z];
 		}
 		public override bool IsInside(Vector3Int pos) {
-			return (pos.x >= _position.x && pos.y >= _position.y && pos.x >= _position.z &&
+			return (pos.x >= _position.x && pos.y >= _position.y && pos.z >= _position.z &&
 			pos.x < _position.x + _uSize && pos.y < _position.y + _uSize && pos.z < _position.z + _uSize);
 		}
 		public Chunk[,,] Chunks { get { return _chunks; } set { _chunks = value; } }
@@ -107,7 +108,7 @@ public class MapData : MonoBehaviour
 			}
 		}
 		public override void InitBlockData() {
-			//TerrrainGen.SecondPass(this);
+			TerrrainGen.SecondPass(this);
 		}
 	}
 
@@ -160,237 +161,9 @@ public class MapData : MonoBehaviour
 		}
 		public BlockType Type { get { return _bt; }set { _bt = value; } }
 	};
-	public class Node
-	{
-		protected Vector3Int _position;//real world position
-		static int _size = 2;
-		protected int _depth;
-		protected int _uSize;
-		protected Node[,,] _nodes;
-		protected Node _parent;
-		public Node(Node parent) {
-			_parent = parent;
-			_nodes = null;
-		}
-		public Node(Vector3 pPos, Vector3Int position, int maxDepth, int depth, Node parent)
-		{
-			_parent = parent;
-			_position = position;
-			_uSize = Sector._suSize;
-			Vector3Int pos = position;
-			depth++;
-			_depth = maxDepth - depth;
-			_nodes = new Node[_size, _size, _size];
-			//u start at depth +=1 so _uSize is 1 less than it should be
-			for (int i = depth; i < maxDepth; i++) {
-				_uSize *= _size;
-			}
-			//which means that it is currently the uSize of the child node 
-			Vector3Int max = pos;
-			for (int i = 0; i < _size; i++) {
-				pos.x = position.x + i * _uSize;
-				max.x = pos.x + _uSize;
-
-				for (int j = 0; j < _size; j++) {
-					pos.y = position.y + j * _uSize;
-					max.y = pos.y + _uSize;
-
-					for (int k = 0; k < _size; k++) {
-						//min pos of child ijk
-						pos.z = position.z + k * _uSize;
-						max.z = pos.z + _uSize;
-						if (pPos.x >= pos.x && pPos.y >= pos.y && pPos.z >= pos.z &&
-							pPos.x < max.x && pPos.y < max.y && pPos.z < max.z) {
-
-							if (depth == maxDepth) {
-								_nodes[i, j, k] = new Sector(pos, this);
-							}
-							else {
-								_nodes[i, j, k] = new Node(pPos, pos, maxDepth, depth, this);
-							}	
-						}
-						else {
-							_nodes[i, j, k] = null;
-						}
-					}
-				}
-			}
-			//and now its the current nodes uSize
-			_uSize *= _size;
-		}
-		/// <summary>
-		/// 
-		/// </summary>
-		/// <param name="pos"> current sector pos in world space</param>
-		/// <param name="next">Normal direction vector :D</param>
-		public virtual Node CreateOne(Vector3Int pos, Vector3Int next) {
-			Vector3Int index = Vector3Int.zero;
-			for (int i = 0; i < _size; i++) {
-				for (int j = 0; j < _size; j++) {
-					for (int k = 0; k < _size; k++) {
-						if(_nodes[i, j, k] != null)
-							if (_nodes[i, j, k].IsInside(pos)) {
-								index.x = i;
-								index.y = j;
-								index.z = k;
-							}
-					}
-				}
-			}
-			Node current = _nodes[index.x, index.y, index.z];
-			pos = current.Position + next * current._uSize;
-			index += next;
-			if (_depth == 0) {
-				Sector s = new Sector(pos, this);
-				_nodes[index.x, index.y, index.z] = s;
-				s.InitBlockData();
-				MeshGenerator.GenerateMesh(s);
-				return s;
-			}
-			else {
-				//current.GetParent(10, 0)._depth;
-				_nodes[index.x, index.y, index.z]
-					= new Node(Vector3.zero, pos, current.GetParent(10, 0)._depth, _depth, this);
-				return _nodes[index.x, index.y, index.z];
-			}
-
-		}
-		public Vector3Int InWhichChild(Vector3Int pos) {
-			Vector3Int index = new Vector3Int(-1,-1,-1);
-
-			for (int i = 0; i < _size; i++) {
-				for (int j = 0; j < _size; j++) {
-					for (int k = 0; k < _size; k++) {
-						if (pos.x >= _position.x && pos.y >= _position.y && pos.x >= _position.z &&
-							pos.x < _position.x + _uSize && pos.y < _position.y + _uSize && pos.z < _position.z + _uSize) {
-							index = new Vector3Int(i, j, k);
-						}
-					}
-				}
-			}
-			return index;
-		}
-		/// <summary>
-		/// Returns leaf node
-		/// </summary>
-		public Node CreateChildBranch(Vector3Int directionNormal) {
-			Node n;
-			Vector3Int index = InWhichChild(_position + (directionNormal*_size));
-			_nodes[index.x, index.y, index.z]
-			return null;
-		}
-		public int GetChildSize() {
-			foreach (Node n in _nodes) {
-				if (n != null)
-					return n._uSize;
-			}
-			return -1;
-		}
-		public  Node CreateNext( Vector3Int directionNormal) {
-			int s = 0;
-			foreach (Node n in _nodes) {
-				if (n != null)
-					s = n._uSize;
-			}
-			Vector3Int pos = _position + directionNormal * s;
-			Node parent = this;
-			while (!parent.IsInside(pos)) {
-				parent = parent.Parent;
-			}
-			
-			Vector3Int index = Vector3Int.zero;
-			for (int i = 0; i < _size; i++) {
-				for (int j = 0; j < _size; j++) {
-					for (int k = 0; k < _size; k++) {
-						if (_nodes[i, j, k] != null)
-							if (_nodes[i, j, k].IsInside(pos)) {
-								index.x = i;
-								index.y = j;
-								index.z = k;
-							}
-					}
-				}
-			}
-			return null;
-		}
-		public Node GetParent(int distance, int count) {
-			count++;
-			if (distance == count || this._parent == null)
-				return this;
-			return this.Parent.GetParent(distance, count);
-
-		}
-		public virtual void InitBlockData() {
-			for (int i = 0; i < _size; i++) {
-				for (int j = 0; j < _size; j++) {
-					for (int k = 0; k < _size; k++) {
-						//if (_nodes != null) {
-						if (_nodes[i, j, k] != null) {
-							_nodes[i, j, k].InitBlockData();
-						}
-
-					}
-				}
-			}
-		}
-		public virtual BlockData GetBlock(Vector3Int pos) {
-			BlockData bd = null;
-			for (int i = 0; i < _size; i++) {
-				for (int j = 0; j < _size; j++) {
-					for (int k = 0; k < _size; k++) {
-						//if (_nodes != null) {
-						if (_nodes[i, j, k] != null) {
-							if (_nodes[i, j, k].IsInside(pos)) {
-								bd = _nodes[i, j, k].GetBlock(pos);
-							}
-							else {
-								Debug.Log("WTF" + pos);
-							}
-						}
-						
-					}
-				}
-			}
-			return bd;
-		}
-		public virtual bool IsInside(Vector3Int pos) {
-				return (pos.x >= _position.x && pos.y >= _position.y && pos.x >= _position.z &&
-				pos.x < _position.x + _uSize && pos.y < _position.y + _uSize && pos.z < _position.z + _uSize);
-		}
-		public Node GetCurrent(int maxDepth, int depth, Vector3Int pos) {
-			if (_nodes == null) return this;
-			if (depth == maxDepth) return this;
-
-			for (int i = 0; i < _size; i++) {
-				for (int j = 0; j < _size; j++) {
-					for (int k = 0; k < _size; k++) {
-
-						if (_nodes[i, j, k] != null) {
-							if (_nodes[i, j, k].IsInside(pos)) {
-								depth++;
-								return _nodes[i, j, k].GetCurrent(maxDepth, depth, pos);
-							}
-						}
-					}
-				}
-			}
-			return null;
-		}
-		public virtual void Draw(Material mat) {
-			for (int i = 0; i < _size; i++) {
-				for (int j = 0; j < _size; j++) {
-					for (int k = 0; k < _size; k++) {
-						if (_nodes[i, j, k] != null) {
-							_nodes[i, j, k].Draw(mat);
-						}
-					}
-				}
-			}
-		}
-		public Vector3Int Position { get => _position; set => _position = value; }
-		public Node Parent { get => _parent; set => _parent = value; }
-	}
+	
 	public static class StaticFunctions {
+		public static int _maxDepth = 5;
 		public static Vector3Int Vector3F2Int(Vector3 pos) {
 			return new Vector3Int((int)pos.x, (int)pos.y, (int)pos.z);
 		}

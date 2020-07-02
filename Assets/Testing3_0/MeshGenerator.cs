@@ -62,7 +62,7 @@ namespace Version3_1 {
 			chunk.SolidMesh.uv = _uvs.ToArray();
 			chunk.SolidMesh.triangles = _tris.ToArray();
 			chunk.SolidMesh.RecalculateNormals();
-			//chunk.RecalculateCollider();
+			chunk.RecalculateCollider();
 
 			ResetCache();
 

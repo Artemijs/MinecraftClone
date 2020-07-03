@@ -34,27 +34,35 @@ namespace Version3_1 {
 			Cursor.visible = false;
 			Cursor.lockState = CursorLockMode.Confined;
 		}
-
+		Vector3[] _allPs = new Vector3[] { new Vector3(-1, 25, -1), new Vector3(0, 25, 0), new Vector3(-1, 25, -1) };
 		// Update is called once per frame
+		int _posIndex = 0;
 		void Update() {
 
+			if (Input.GetKeyDown(KeyCode.N)) {
+				//_player.transform.position
+				_player.transform.position = _allPs[_posIndex%_allPs.Length];
+				_posIndex++;
+			}
+			//im being held captive against my free will pls help me 
 			_map.Draw(_material);
 			CheckPlayerMoved();
 			HandleInput();
-
 		}
 		void CheckPlayerMoved() {
-			if (!_current.IsInside(StaticFunctions.Vector3F2Int(_player.position))) {
-				Node n = _current.Parent.Parent.Search(10, 0, StaticFunctions.Vector3F2Int(_player.position));
-				if (n != null) {
-					_current = (Sector)n;
-					return;
+			Vector3Int player = StaticFunctions.Vector3F2Int(_player.position);
+			if (!_current.IsInside(player)) {
+				if (!_current.CheckExists(player, 666)) {
+					//Vector3Int dir = GetDir(_current.Position, StaticFunctions.Vector3F2Int(_player.position));
+					Sector s = (Sector)_current.CreateNextFromPos(player);
+					s.InitBlockData();
+					MeshGenerator.GenerateMesh(s);
+					_current = s;
 				}
-				//Vector3Int dir = GetDir(_current.Position, StaticFunctions.Vector3F2Int(_player.position));
-				Sector s = (Sector)_current.CreateNextFromPos(StaticFunctions.Vector3F2Int(_player.position));
-				s.InitBlockData();
-				MeshGenerator.GenerateMesh(s);
-				_current = s;
+				else {
+					_current = (Sector)_map.Search(10, 666, StaticFunctions.Vector3F2Int(_player.position));
+				}
+			
 			}
 		}
 		

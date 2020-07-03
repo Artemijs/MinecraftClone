@@ -13,6 +13,7 @@ namespace Version3_1 {
 			_parent = parent;
 			_nodes = null;
 		}
+		//next time add a depth uSize lookup table
 		public Node(Vector3 pPos, Vector3Int position, int maxDepth, int depth, Node parent) {
 			_parent = parent;
 			_position = position;
@@ -58,6 +59,7 @@ namespace Version3_1 {
 			//and now its the current nodes uSize
 			_uSize *= _size;
 		}
+
 		/// <summary>
 		/// 
 		/// </summary>
@@ -112,7 +114,6 @@ namespace Version3_1 {
 						if (pos.x >= startPos.x && pos.y >= startPos.y && pos.z >= startPos.z &&
 							pos.x < endPos.x && pos.y < endPos.y && pos.z < endPos.z) {
 							return new Vector3Int(i, j, k);
-							 
 						}
 					}
 				}
@@ -123,15 +124,14 @@ namespace Version3_1 {
 		/// 
 		/// </summary>
 		/// <param name="position"> in world space</param>
+		/// <param name="position"> in world space</param>
 		public void CreateChildBranch(Vector3Int position) {
-
-			
 			Vector3Int index = ChildIndex(position);
 			int s = GetChildUSize();
 			if (_depth == 0)
 				_nodes[index.x, index.y, index.z] = new Sector(index * s + _position, this);
 			else
-				_nodes[index.x, index.y, index.z] = new Node( position, index * s + _position, StaticFunctions._maxDepth, _depth, this);
+				_nodes[index.x, index.y, index.z] = new Node( position, index * s + _position, StaticFunctions._maxDepth, _depth + 1, this);
 		}
 
 		public int GetChildUSize() {
@@ -142,7 +142,6 @@ namespace Version3_1 {
 			return -1;
 		}
 		public Node CreateNext(Vector3Int directionNormal) {
-
 			Vector3Int pos = _position + directionNormal * _uSize;
 
 			Node parent = this.Parent;
@@ -186,6 +185,28 @@ namespace Version3_1 {
 				}
 			}
 		}
+		public bool CheckExists(Vector3Int pos, int desiredDepth) {
+			//check inside 
+			//get index
+			//if index is null
+			
+			if (!IsInside(pos)) {
+				return this.Parent.CheckExists(pos, desiredDepth);
+			}
+			else {
+				if (_depth == (desiredDepth))
+					return true;
+				else {
+					Vector3Int index = this.ChildIndex(pos);
+					if (_nodes[index.x, index.y, index.z] != null) {
+						return _nodes[index.x, index.y, index.z].CheckExists(pos, desiredDepth);
+					}
+					else
+						return false;
+				}
+			
+			}
+		}
 		public virtual BlockData GetBlock(Vector3Int pos) {
 			BlockData bd = null;
 			for (int i = 0; i < _size; i++) {
@@ -200,7 +221,6 @@ namespace Version3_1 {
 								Debug.Log("WTF" + pos);
 							}
 						}
-
 					}
 				}
 			}

@@ -47,12 +47,13 @@ namespace Version3_1 {
 								_nodes[i, j, k] = new Sector(pos, this);
 							}
 							else {
+								///THERE IS A MASSIVE PROBLEM HERE
 								_nodes[i, j, k] = new Node(pPos, pos, maxDepth, depth, this);
 							}
 						}
-						else {
-							_nodes[i, j, k] = null;
-						}
+						//else {
+						//	_nodes[i, j, k] = null;
+						//}
 					}
 				}
 			}
@@ -128,10 +129,16 @@ namespace Version3_1 {
 		public void CreateChildBranch(Vector3Int position) {
 			Vector3Int index = ChildIndex(position);
 			int s = GetChildUSize();
-			if (_depth == 0)
-				_nodes[index.x, index.y, index.z] = new Sector(index * s + _position, this);
-			else
-				_nodes[index.x, index.y, index.z] = new Node( position, index * s + _position, StaticFunctions._maxDepth, _depth + 1, this);
+			if (_nodes[index.x, index.y, index.z] == null) {
+				if (_depth == 0)
+					_nodes[index.x, index.y, index.z] = new Sector(index * s + _position, this);
+				else
+					_nodes[index.x, index.y, index.z] = new Node(position, index * s + _position, StaticFunctions._maxDepth, _depth + 1, this);
+
+			}
+			else {
+				_nodes[index.x, index.y, index.z].CreateChildBranch(position);
+			}
 		}
 
 		public int GetChildUSize() {

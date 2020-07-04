@@ -30,7 +30,7 @@ namespace Version3_1 {
 			_current.InitBlockData();
 			Debug.Log(bd.Type);
 			MeshGenerator.GenerateMesh(_current);
-
+			UpdateLoadArea();
 			Cursor.visible = false;
 			Cursor.lockState = CursorLockMode.Confined;
 		}
@@ -41,7 +41,7 @@ namespace Version3_1 {
 
 			if (Input.GetKeyDown(KeyCode.N)) {
 				//_player.transform.position
-				_player.transform.position = _allPs[_posIndex%_allPs.Length];
+				//_player.transform.position = _allPs[_posIndex%_allPs.Length];
 				_posIndex++;
 			}
 			//im being held captive against my free will pls help me 
@@ -52,22 +52,24 @@ namespace Version3_1 {
 		void CheckPlayerMoved() {
 			Vector3Int player = StaticFunctions.Vector3F2Int(_player.position);
 			if (!_current.IsInside(player)) {
-				if (!_current.CheckExists(player, 666)) {
-					//Vector3Int dir = GetDir(_current.Position, StaticFunctions.Vector3F2Int(_player.position));
-					Sector s = (Sector)_current.CreateNextFromPos(player);
-					s.InitBlockData();
-					MeshGenerator.GenerateMesh(s);
-					_current = s;
-				}
-				else {
-					_current = (Sector)_map.Search(10, 666, StaticFunctions.Vector3F2Int(_player.position));
-				}
-			
+				UpdateLoadArea();
+				_current = (Sector)_map.Search(100, 666, player);
 			}
 		}
-		
 		void HandleInput() {
 
+		}
+		public void UpdateLoadArea() {
+			Transform go = _player.Find("load_area");
+			for (int i = 0; i < go.childCount; i++) {
+				Vector3Int loadPos = StaticFunctions.Vector3F2Int(go.GetChild(i).position);
+				if (!_current.CheckExists(loadPos, 666)) {
+					//Vector3Int dir = GetDir(_current.Position, StaticFunctions.Vector3F2Int(_player.position));
+					Sector s = (Sector)_current.CreateNextFromPos(loadPos);
+					//s.InitBlockData();
+					//MeshGenerator.GenerateMesh(s);
+				}
+			}
 		}
 
 	}

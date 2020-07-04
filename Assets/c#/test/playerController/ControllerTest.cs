@@ -16,19 +16,24 @@ public class ControllerTest : MonoBehaviour {
 	BlockType _selectedType;
 	Vector3Int _targetPos;
 	Vector3 _cursorNormal;
+	public Transform[,] _loadRange;
 	void Start () {
 		//_targetIndicator = GameObject.Instantiate(_targetIndicator);
 		_selectedType = BlockType.DIRT;
 		_camera = GameObject.Find ("Camera");
 		_chunkCtrl = GameObject.Find("Main").GetComponent<ChunkController>();
 
+		Transform go = gameObject.transform.Find("load_area");
+		for (int i = 0; i < go.childCount; i++) {
+			go.GetChild(i).localPosition = go.GetChild(i).localPosition * Version3_1.Sector._suSize*2;
+		}
 	}
 	// Update is called once per frame
 	void Update () {
 		//this.transform.position += new Vector3(0,0,-0.1f);
 		HandleInput ();
 		HandleTargetCursor();
-		HandleMouseInput();
+		//HandleMouseInput();
 
 		//CheckBlockChange ();
 	}
@@ -128,7 +133,6 @@ public class ControllerTest : MonoBehaviour {
 			_cursorNormal = Vector3.zero;
 		}
 	}
-	
 	private void CheckBlockChange (){
 		//legacy, will be rewritten later
 		/*int newId = _world.ChunkCtrl.GetBlockId (transform.position);

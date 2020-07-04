@@ -58,13 +58,14 @@ public class MapData : MonoBehaviour
 			_chunks = new Chunk[_sSize, _sSize, _sSize];
 			Vector3Int pos = Vector3Int.zero;
 			_blockData = new BlockData[_suSize, _suSize, _suSize];
+			GameObject chunkParent = new GameObject(position.x + " " + position.y + " " + position.z);
 			for (int i = 0; i < _sSize; i++) {
 				for (int j = 0; j < _sSize; j++) {
 					for (int k = 0; k < _sSize; k++) {
 						pos.x = i * Chunk._uSize;
 						pos.y = j * Chunk._uSize;
 						pos.z = k * Chunk._uSize;
-						_chunks[i, j, k] = new Chunk(pos + position, this);
+						_chunks[i, j, k] = new Chunk(pos + position, this, chunkParent.transform);
 					}
 				}
 			}
@@ -99,6 +100,9 @@ public class MapData : MonoBehaviour
 		public BlockData[,,] BlockData { get { return _blockData; } set { _blockData = value; } }
 
 		public override void Draw(Material mat) {
+			if (_position == new Vector3Int(-50, 0, 50)) {
+				Debug.Log("WTF");
+			}
 			for (int i = 0; i < _sSize; i++) {
 				for (int j = 0; j < _sSize; j++) {
 					for (int k = 0; k < _sSize; k++) {
@@ -120,11 +124,13 @@ public class MapData : MonoBehaviour
 		Mesh _solidMesh;
 		Mesh _transMesh;
 		Vector3Int _position;
-		public Chunk(Vector3Int position, Node parent) {
+		public Chunk(Vector3Int position, Node parent, Transform tparent) {
+			
 			_position = position;
 			_solidMesh = new Mesh();
 			_transMesh = new Mesh();
-			_collider = new GameObject();
+			_collider = new GameObject("mesh");
+			_collider.transform.SetParent(tparent);
 			_collider.AddComponent<MeshCollider>();
 		}
 		public void RecalculateCollider() {

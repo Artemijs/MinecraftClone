@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace Version3_1 {
+
 	public class MeshGenerator {
 		static Sector _currentSector;
 		static List<Vector3> _vertices;
@@ -449,4 +449,3 @@ namespace Version3_1 {
 		public Pair() {
 		}
 	}
-}

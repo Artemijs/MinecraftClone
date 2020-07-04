@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace Version3_1 {
+
 	public class Node {
 		protected Vector3Int _position;//real world position
 		static int _size = 2;
@@ -278,4 +278,3 @@ namespace Version3_1 {
 		public Vector3Int Position { get => _position; set => _position = value; }
 		public Node Parent { get => _parent; set => _parent = value; }
 	}
-}

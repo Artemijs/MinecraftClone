@@ -1,7 +1,7 @@
 ﻿using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
-namespace Version3_1 {
+
 	public class Main : MonoBehaviour {
 
 		Node _map;
@@ -61,29 +61,28 @@ namespace Version3_1 {
 		}
 		public void UpdateLoadArea() {
 
-			int id = SpeedTests.Instance.StartTest(TestName.UpdateLoadArea);
+			int id1 = SpeedTests.Instance.StartTest(TestName.UpdateLoadArea);
 
 			Transform go = _player.Find("load_area");
 			for (int i = 0; i < go.childCount; i++) {
 
-				int id1 = SpeedTests.Instance.StartTest(TestName.UpdateLoadOneLoop);
+				
 
 				Vector3Int loadPos = StaticFunctions.Vector3F2Int(go.GetChild(i).position);
 				if (!_current.CheckExists(loadPos, 666)) {
 					//Vector3Int dir = GetDir(_current.Position, StaticFunctions.Vector3F2Int(_player.position));
 					Sector s = (Sector)_current.CreateNextFromPos(loadPos);
-					s.InitBlockData();
-					MeshGenerator.GenerateMesh(s);
+					ActionQue.Add2Que(s);
 				}
 
-				SpeedTests.Instance.EndTest(TestName.UpdateLoadOneLoop, id1);
+
+				
 			}
-
-			SpeedTests.Instance.EndTest(TestName.UpdateLoadArea, id);
-
+			SpeedTests.Instance.EndTest(TestName.UpdateLoadArea, id1);
 			SpeedTests.Instance.PrintResults();
+			
 		}
 
 	}
 
-}
+

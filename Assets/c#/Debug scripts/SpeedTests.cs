@@ -9,7 +9,7 @@ public enum TestName {
 	SectorCreate,
 	SectorBlockCreate,
 	SecondPass,
-
+	ACTION,
 	END
 };
 
@@ -52,7 +52,7 @@ public class SpeedTests {
 			}
 			Debug.Log((TestName)(i)+" "+(total.TotalMilliseconds/ current.Count));
 		}
-		_testData.Clear();
+		//_testData.Clear();
 	}
 
 }

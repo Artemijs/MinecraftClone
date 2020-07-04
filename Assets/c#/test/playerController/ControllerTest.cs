@@ -12,7 +12,6 @@ public class ControllerTest : MonoBehaviour {
 	public GameObject _targetIndicator;
 	bool _changedBlock = false;
 	bool _lock = false;
-	ChunkController _chunkCtrl;
 	BlockType _selectedType;
 	Vector3Int _targetPos;
 	Vector3 _cursorNormal;
@@ -21,11 +20,10 @@ public class ControllerTest : MonoBehaviour {
 		//_targetIndicator = GameObject.Instantiate(_targetIndicator);
 		_selectedType = BlockType.DIRT;
 		_camera = GameObject.Find ("Camera");
-		_chunkCtrl = GameObject.Find("Main").GetComponent<ChunkController>();
 
 		Transform go = gameObject.transform.Find("load_area");
 		for (int i = 0; i < go.childCount; i++) {
-			go.GetChild(i).localPosition = go.GetChild(i).localPosition * Version3_1.Sector._suSize*2;
+			go.GetChild(i).localPosition = go.GetChild(i).localPosition * Sector._suSize*2;
 		}
 	}
 	// Update is called once per frame
@@ -40,20 +38,20 @@ public class ControllerTest : MonoBehaviour {
 
 	private void HandleMouseInput() {
 		if (Input.GetMouseButtonDown(0)) {
-			if(Vector3.Distance(transform.position, _targetIndicator.transform.position)< 5)
-				_chunkCtrl.CreateBlock(_targetIndicator.transform.position, _cursorNormal, _selectedType);
+			//if(Vector3.Distance(transform.position, _targetIndicator.transform.position)< 5)
+				//_chunkCtrl.CreateBlock(_targetIndicator.transform.position, _cursorNormal, _selectedType);
 		}
 		if (Input.GetMouseButton(1))
 		{
 			if (Vector3.Distance(transform.position, _targetIndicator.transform.position) < 5)
 			{
-				_chunkCtrl.StartDeletingBlock(_targetIndicator.transform.position, _cursorNormal);
+				//_chunkCtrl.StartDeletingBlock(_targetIndicator.transform.position, _cursorNormal);
 				
 				//SetTargetBlockPos(_targetIndicator.transform.position, _cursorNormal);
 			}
 		}
 		if (Input.GetMouseButtonUp(1)) {
-			_chunkCtrl.CancelDeleting();
+			//_chunkCtrl.CancelDeleting();
 		}
 	}
 	private void HandleInput(){

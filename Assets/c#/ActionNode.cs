@@ -20,51 +20,76 @@ public class CreateSectorAction : ActionNode {
 	TerraformBlockDataAction _terraformAction;
 	//create mesh+bounds action
 	CreateMeshAction _cMeshAction;
+	List<ActionNode> _allNodes;
+	int _index;
 	public CreateSectorAction(Sector s) {
 		_sector = s;
+		_allNodes = new List<ActionNode>();
+		_index = 0;
 	}
 	public override bool Execute() {
+		if (_allNodes[_index].Execute()) {
+			_index++;
+			if (_index >= _allNodes.Count) {
+				return true;
+			}
+		}
 		return false;
 	}
 	public override void AddAction(int id, ActionNode an) {
 		if (id == 0) {
 			_cChunksAction = (CreateChunksAction)an;
 		}
-		if (id == 0) {
+		if (id == 1) {
 			_cBlockDataAction = (CreateBlockDataAction)an;
 		}
-		if (id == 0) {
+		if (id == 2) {
 			_terraformAction = (TerraformBlockDataAction)an;
 		}
-		if (id == 0) {
+		if (id == 3) {
 			_cMeshAction = (CreateMeshAction)an;
 		}
-		
+		_allNodes.Add(an);
 	}
 	public Sector Sector { get { return _sector; } set { _sector = value; } }
 };
+namespace Parameters {
+	public class ChunkActionData {
+		public Vector3Int _position;
+		public int _size;
+		public ChunkActionData(Vector3Int pos, int size) {
+			_position = pos;
+			_size = size;
+		}
+	};
+};
 public class CreateChunksAction:ActionNode {
 	CreateSectorAction _parent;
-	public CreateChunksAction(ActionNode parent) {
+	Parameters.ChunkActionData _parameters;
+	public CreateChunksAction(ActionNode parent, Parameters.ChunkActionData data) {
 		_parent = (CreateSectorAction)parent;
+		_parameters = data;
 	}
 	public override bool Execute() {
-		/*GameObject chunkParent = new GameObject(position.x + " " + position.y + " " + position.z);
-		for (int i = 0; i < _sSize; i++) {
-			for (int j = 0; j < _sSize; j++) {
-				for (int k = 0; k < _sSize; k++) {
+		Vector3Int pos = Vector3Int.zero;
+		GameObject chunkParent = new GameObject(_parameters._position.x + " " + _parameters._position.y + " " + _parameters._position.z);
+		Sector s = _parent.Sector;
+		for (int i = 0; i < _parameters._size; i++) {
+			for (int j = 0; j < _parameters._size; j++) {
+				for (int k = 0; k < _parameters._size; k++) {
 					pos.x = i * Chunk._uSize;
 					pos.y = j * Chunk._uSize;
 					pos.z = k * Chunk._uSize;
-					_chunks[i, j, k] = new Chunk(pos + position, this, chunkParent.transform);
+					s.Chunks[i, j, k] = new Chunk(pos + _parameters._position, s, chunkParent.transform);
 				}
 			}
-		}*/
+		}
 		return true;
 	}
 	public override void AddAction(int id, ActionNode an) {
 	}
 };
+
 public class CreateBlockDataAction : ActionNode {
 	//pos, index
 	CreateSectorAction _parent;
@@ -74,12 +99,13 @@ public class CreateBlockDataAction : ActionNode {
 		_parent = parent;
 		_parameterQue = new List<Pair<Vector3Int, Vector3Int>>();
 	}
-	public override void AddAction(int id, ActionNode an) {
-		
-	}
 
 	public override bool Execute() {
-		return false;
+
+		for (int i = 0; i < _parameterQue.Count; i++) {
+			this.CreateBlockData(_parameterQue[i]);
+		}
+		return true;
 	}
 	public void Add2Que(Pair<Vector3Int, Vector3Int> args) {
 		_parameterQue.Add(args);
@@ -91,7 +117,10 @@ public class CreateBlockDataAction : ActionNode {
 		_parent.Sector.BlockData[args.two.x, args.two.y, args.two.z] = new BlockData(args.one, bt);
 
 	}
+	public override void AddAction(int id, ActionNode an) {
+	}
 };
+
 public class TerraformBlockDataAction : ActionNode {
 	CreateSectorAction _parent;
 	public TerraformBlockDataAction(CreateSectorAction parent) {
@@ -106,6 +135,7 @@ public class TerraformBlockDataAction : ActionNode {
 		return true;
 	}
 }
+
 public class CreateMeshAction : ActionNode {
 	CreateSectorAction _parent;
 	public CreateMeshAction(CreateSectorAction parent) {

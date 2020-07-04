@@ -22,6 +22,28 @@ public class Sector : Node {
 		Vector3Int pos = Vector3Int.zero;
 		_blockData = new BlockData[_suSize, _suSize, _suSize];
 
+		CreateSectorAction csa = new CreateSectorAction(this);
+
+		Parameters.ChunkActionData sad = new Parameters.ChunkActionData(position, _sSize);
+
+		CreateChunksAction cChunk = new CreateChunksAction(csa, sad);
+		CreateBlockDataAction cbda = new CreateBlockDataAction(csa);
+		TerraformBlockDataAction tfbda = new TerraformBlockDataAction(csa);
+
+		for (int i = 0; i < _suSize; i++) {
+			for (int j = 0; j < _suSize; j++) {
+				for (int k = 0; k < _suSize; k++) {
+					cbda.Add2Que(new Pair<Vector3Int, Vector3Int>(_position, new Vector3Int(i, j, k)));
+				}
+			}
+		}
+
+		csa.AddAction(0, cChunk);
+		csa.AddAction(1, cbda);
+		csa.AddAction(2, tfbda);
+		csa.AddAction(3, new CreateMeshAction(csa));
+
+		/*
 		GameObject chunkParent = new GameObject(position.x + " " + position.y + " " + position.z);
 		for (int i = 0; i < _sSize; i++) {
 			for (int j = 0; j < _sSize; j++) {
@@ -38,11 +60,11 @@ public class Sector : Node {
 		SpeedTests.Instance.EndTest(TestName.SectorCreate, testId1);
 		int testId2 = SpeedTests.Instance.StartTest(TestName.SectorBlockCreate);
 
-		CreateBlockData();
+		//CreateBlockData();
 
 		SpeedTests.Instance.EndTest(TestName.SectorBlockCreate, testId2);
 		SpeedTests.Instance.EndTest(TestName.SectorCreateTotal, testId);
-
+		*/
 	}
 	private void CreateBlockData() {
 		for (int i = 0; i < _suSize; i++) {

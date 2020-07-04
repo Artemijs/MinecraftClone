@@ -53,11 +53,16 @@ public class MapData : MonoBehaviour
 		/// </summary>
 		/// <param name="position"> IN WORDLD SPACE </param>
 		public Sector(Vector3Int position, Node parent): base(parent) {
+
+			int testId = SpeedTests.Instance.StartTest(TestName.SectorCreateTotal);
+			int testId1 = SpeedTests.Instance.StartTest(TestName.SectorCreate);
+
 			base._uSize = _suSize;
 			_position = position;
 			_chunks = new Chunk[_sSize, _sSize, _sSize];
 			Vector3Int pos = Vector3Int.zero;
 			_blockData = new BlockData[_suSize, _suSize, _suSize];
+
 			GameObject chunkParent = new GameObject(position.x + " " + position.y + " " + position.z);
 			for (int i = 0; i < _sSize; i++) {
 				for (int j = 0; j < _sSize; j++) {
@@ -70,7 +75,15 @@ public class MapData : MonoBehaviour
 				}
 			}
 			_depth = 666;
+
+			SpeedTests.Instance.EndTest(TestName.SectorCreate, testId1);
+			int testId2 = SpeedTests.Instance.StartTest(TestName.SectorBlockCreate);
+
 			CreateBlockData();
+
+			SpeedTests.Instance.EndTest(TestName.SectorBlockCreate, testId2);
+			SpeedTests.Instance.EndTest(TestName.SectorCreateTotal, testId);
+			
 		}
 		private void CreateBlockData() {
 			for (int i = 0; i < _suSize; i++) {
@@ -112,7 +125,9 @@ public class MapData : MonoBehaviour
 			}
 		}
 		public override void InitBlockData() {
+			int testId = SpeedTests.Instance.StartTest(TestName.SecondPass);
 			TerrrainGen.SecondPass(this);
+			SpeedTests.Instance.EndTest(TestName.SecondPass, testId);
 		}
 	}
 

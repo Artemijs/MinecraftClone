@@ -28,6 +28,7 @@ public class CreateSectorAction : ActionNode {
 		_index = 0;
 	}
 	public override bool Execute() {
+
 		if (_allNodes[_index].Execute()) {
 			_index++;
 			if (_index >= _allNodes.Count) {
@@ -94,6 +95,8 @@ public class CreateBlockDataAction : ActionNode {
 	//pos, index
 	CreateSectorAction _parent;
 	List<Pair<Vector3Int, Vector3Int>> _parameterQue;
+	int _nrPerFrame = 5000;
+	
 	public CreateBlockDataAction( CreateSectorAction parent) {
 
 		_parent = parent;
@@ -101,20 +104,30 @@ public class CreateBlockDataAction : ActionNode {
 	}
 
 	public override bool Execute() {
-
-		for (int i = 0; i < _parameterQue.Count; i++) {
+		//this.CreateBlockData(_parameterQue[_currentAction])
+		int len = GetLen();
+		for (int i = 0; i < len; i++) {
 			this.CreateBlockData(_parameterQue[i]);
 		}
-		return true;
+		_parameterQue.RemoveRange(0, len);
+		if (_parameterQue.Count == 0) return true;
+		else 
+			return false;
+	}
+	int GetLen() {
+		if (_parameterQue.Count < _nrPerFrame)
+			return _parameterQue.Count;
+		else
+			return _nrPerFrame;
 	}
 	public void Add2Que(Pair<Vector3Int, Vector3Int> args) {
 		_parameterQue.Add(args);
 	}
 	public void CreateBlockData(Pair<Vector3Int, Vector3Int> args) {
-		BlockType bt = TerrrainGen.GetBlockType(args.one);
+		BlockType bt = TerrrainGen.GetBlockType(args.one + args.two);
 		//if (j + _position.y > 2)
 		//	bt = BlockType.AIR;
-		_parent.Sector.BlockData[args.two.x, args.two.y, args.two.z] = new BlockData(args.one, bt);
+		_parent.Sector.BlockData[args.two.x, args.two.y, args.two.z] = new BlockData(args.one +args.two , bt);
 
 	}
 	public override void AddAction(int id, ActionNode an) {

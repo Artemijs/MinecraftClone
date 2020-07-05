@@ -13,9 +13,7 @@ public class Sector : Node {
 	/// <param name="position"> IN WORDLD SPACE </param>
 	public Sector(Vector3Int position, Node parent) : base(parent) {
 
-		int testId = SpeedTests.Instance.StartTest(TestName.SectorCreateTotal);
-		int testId1 = SpeedTests.Instance.StartTest(TestName.SectorCreate);
-
+		
 		base._uSize = _suSize;
 		_position = position;
 		_chunks = new Chunk[_sSize, _sSize, _sSize];
@@ -42,7 +40,7 @@ public class Sector : Node {
 		csa.AddAction(1, cbda);
 		csa.AddAction(2, tfbda);
 		csa.AddAction(3, new CreateMeshAction(csa));
-
+		ActionQue.Add2Que(csa);
 		/*
 		GameObject chunkParent = new GameObject(position.x + " " + position.y + " " + position.z);
 		for (int i = 0; i < _sSize; i++) {
@@ -57,13 +55,9 @@ public class Sector : Node {
 		}
 		_depth = 666;
 
-		SpeedTests.Instance.EndTest(TestName.SectorCreate, testId1);
-		int testId2 = SpeedTests.Instance.StartTest(TestName.SectorBlockCreate);
-
+		
 		//CreateBlockData();
 
-		SpeedTests.Instance.EndTest(TestName.SectorBlockCreate, testId2);
-		SpeedTests.Instance.EndTest(TestName.SectorCreateTotal, testId);
 		*/
 	}
 	private void CreateBlockData() {
@@ -100,7 +94,8 @@ public class Sector : Node {
 		for (int i = 0; i < _sSize; i++) {
 			for (int j = 0; j < _sSize; j++) {
 				for (int k = 0; k < _sSize; k++) {
-					_chunks[i, j, k].Draw(mat);
+					if(_chunks[i, j, k] != null)
+						_chunks[i, j, k].Draw(mat);
 				}
 			}
 		}

@@ -140,7 +140,11 @@ using UnityEngine;
 				_nodes[index.x, index.y, index.z].CreateChildBranch(position);
 			}
 		}
-
+	/// <summary>
+	/// ///////////////////////////////////////////////////////////////////////
+	/// DEPTH SIZE LOOK UP TABLE BRUV :D
+	/// </summary>
+	/// <returns></returns>
 		public int GetChildUSize() {
 			foreach (Node n in _nodes) {
 				if (n != null)

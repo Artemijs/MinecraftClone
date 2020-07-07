@@ -14,7 +14,7 @@ public class Sector : Node {
 	public Sector(Vector3Int position, Node parent) : base(parent) {
 
 		
-		base._uSize = _suSize;
+		//base._uSize = _suSize;
 		_position = position;
 		_chunks = new Chunk[_sSize, _sSize, _sSize];
 		Vector3Int pos = Vector3Int.zero;
@@ -65,13 +65,10 @@ public class Sector : Node {
 			for (int j = 0; j < _suSize; j++) {
 				for (int k = 0; k < _suSize; k++) {
 					BlockType bt = TerrrainGen.GetBlockType(_position + new Vector3Int(i, j, k));
-					//if (j + _position.y > 2)
-					//	bt = BlockType.AIR;
 					_blockData[i, j, k] = new BlockData(_position + new Vector3Int(i, j, k), bt);
 				}
 			}
 		}
-
 	}
 	public override BlockData GetBlock(Vector3Int pos) {
 		pos -= _position;
@@ -81,16 +78,14 @@ public class Sector : Node {
 		return _blockData[pos.x, pos.y, pos.z];
 	}
 	public override bool IsInside(Vector3Int pos) {
+		int usize = USize;
 		return (pos.x >= _position.x && pos.y >= _position.y && pos.z >= _position.z &&
-		pos.x < _position.x + _uSize && pos.y < _position.y + _uSize && pos.z < _position.z + _uSize);
+		pos.x < _position.x + usize && pos.y < _position.y + usize && pos.z < _position.z + usize);
 	}
 	public Chunk[,,] Chunks { get { return _chunks; } set { _chunks = value; } }
 	public BlockData[,,] BlockData { get { return _blockData; } set { _blockData = value; } }
 
 	public override void Draw(Material mat) {
-		if (_position == new Vector3Int(-50, 0, 50)) {
-			Debug.Log("WTF");
-		}
 		for (int i = 0; i < _sSize; i++) {
 			for (int j = 0; j < _sSize; j++) {
 				for (int k = 0; k < _sSize; k++) {
@@ -118,6 +113,8 @@ public class BlockData {
 
 public static class StaticFunctions {
 	public static int _maxDepth = 5;
+	public static List<int> _nodeChildCount;
+	public static List<int> _uSizeArray;
 	public static Vector3Int Vector3F2Int(Vector3 pos) {
 		return new Vector3Int((int)pos.x, (int)pos.y, (int)pos.z);
 	}

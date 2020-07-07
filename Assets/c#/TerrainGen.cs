@@ -25,7 +25,8 @@ public enum BlockType {
 	WATER,
 	TREE_LEAVES,
 	AIR,
-	GRASS
+	GRASS,
+	NOTHING
 };
 	public static class TerrrainGen {
 		enum PerlinType {
@@ -105,8 +106,8 @@ public enum BlockType {
 			Vector3Int sPos = s.Position;
 			for (int x = 0; x < Sector._suSize; x++) {
 				for (int z = 0; z < Sector._suSize; z++) {
-					
-					int y = sPos.y+Sector._suSize-1;
+
+				int y = Sector._suSize-1;
 					BlockData bd = s.GetBlock(sPos + new Vector3Int(x, y, z));
 					while (bd.Type != BlockType.DIRT) {
 						y--;

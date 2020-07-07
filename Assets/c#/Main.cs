@@ -12,11 +12,7 @@ public class Main : MonoBehaviour {
 	void Awake() {
 		MeshGenerator.Init();
 		TerrrainGen.SetUp();
-		Chunk._size = 5;
-		Chunk._uSize = Chunk._size * 1;
-
-		Sector._sSize = 10;
-		Sector._suSize = Sector._sSize * Chunk._uSize;
+		
 	}
 
 	// Start is called before the first frame update
@@ -24,12 +20,21 @@ public class Main : MonoBehaviour {
 		Vector3Int pPos = StaticFunctions.Vector3F2Int(_player.position);
 
 		pPos.y = 0;
-		_map = new Node(_player.position, new Vector3Int(-1000, -1000, -1000), StaticFunctions._maxDepth, 0, null);
-		BlockData bd = _map.GetBlock(pPos);
-		_current = (Sector)(_map.Search(10, 0, pPos));
-		//_current.InitBlockData();
-		//MeshGenerator.GenerateMesh(_current);
-		UpdateLoadArea();
+		_map = new Node(pPos, new Vector3Int(-200, -200, -200), StaticFunctions._maxDepth, null);
+		
+		int mapSize = 2;
+		_map.CreateChildArea(pPos, 3);
+		_current = (Sector)(_map.Search(10, 1, pPos));
+		//Vector3Int pPos = StaticFunctions.Vector3F2Int(_player.position);
+		/*for (int i = -1; i < mapSize; i++) {
+			if (i == 0) continue;
+			for (int j = -1; j < mapSize; j++) {
+				if (j == 0) continue;
+				_map.CreateChildBranch(pPos + new Vector3Int(i * Sector._suSize, 0, j * Sector._suSize) +
+					new Vector3Int( Sector._suSize/2, 0,  Sector._suSize/2));
+			}
+		} */
+		///UpdateLoadArea();
 		Cursor.visible = false;
 		Cursor.lockState = CursorLockMode.Confined;
 	}
@@ -42,7 +47,7 @@ public class Main : MonoBehaviour {
 		if (Input.GetKeyDown(KeyCode.N)) {
 			//_player.transform.position
 			//_player.transform.position = _allPs[_posIndex%_allPs.Length];
-			_posIndex++;
+			//_posIndex++;
 		}
 		//im being held captive against my free will pls help me 
 		
@@ -53,7 +58,10 @@ public class Main : MonoBehaviour {
 		Vector3Int player = StaticFunctions.Vector3F2Int(_player.position);
 		if (!_current.IsInside(player)) {
 			UpdateLoadArea();
-			_current = (Sector)_map.Search(100, 666, player);
+			_current = (Sector)_map.Search(100, 1, player);
+			//if (_current == null) {
+			//	Debug.Log("CRRENT IS NULL");
+		//	}
 		}
 	}
 	void HandleInput() {
@@ -63,9 +71,9 @@ public class Main : MonoBehaviour {
 		Transform go = _player.Find("load_area");
 		for (int i = 0; i < go.childCount; i++) {
 			Vector3Int loadPos = StaticFunctions.Vector3F2Int(go.GetChild(i).position);
-			if (!_current.CheckExists(loadPos, 666)) {
+			if (!_map.CheckExists(loadPos, 1)) {
 				//Vector3Int dir = GetDir(_current.Position, StaticFunctions.Vector3F2Int(_player.position));
-				Sector s = (Sector)_current.CreateNextFromPos(loadPos);
+				_current.CreateNextFromPos(loadPos);
 				//ActionQue.Add2Que(s);
 			}
 		}

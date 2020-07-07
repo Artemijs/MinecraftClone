@@ -102,8 +102,9 @@ using UnityEngine;
 			chunk.SolidMesh.uv = _uvs.ToArray();
 			chunk.SolidMesh.triangles = _tris.ToArray();
 			chunk.SolidMesh.RecalculateNormals();
+			//chunk.SolidMesh.RecalculateBounds();
 		//	chunk.RecalculateCollider();
-		}
+	}
 		#region make cude code
 		static public void MakeCubeMesh(BlockData[] nBlocks, BlockType type, Vector3Int pos) {
 			if (nBlocks[0].Type == BlockType.AIR) {//left
@@ -286,7 +287,7 @@ using UnityEngine;
 			BlockData[] bData = new BlockData[6];
 			Vector3Int nPos = pos + new Vector3Int(-1, 0, 0);//left
 			if (CheckOutOfBounds(nPos)) {
-				bData[i] = new BlockData(Vector3Int.zero, BlockType.AIR);
+				bData[i] = new BlockData(Vector3Int.zero, BlockType.NOTHING);
 
 			}
 			else {
@@ -295,7 +296,7 @@ using UnityEngine;
 			i++;
 			nPos = pos + new Vector3Int(1, 0, 0);//right
 			if (CheckOutOfBounds(nPos)) {
-				bData[i] = new BlockData(Vector3Int.zero, BlockType.AIR);
+				bData[i] = new BlockData(Vector3Int.zero, BlockType.NOTHING);
 
 			}
 			else {
@@ -304,7 +305,7 @@ using UnityEngine;
 			i++;
 			nPos = pos + new Vector3Int(0, 0, 1);//forward
 			if (CheckOutOfBounds(nPos)) {
-				bData[i] = new BlockData(Vector3Int.zero, BlockType.AIR);
+				bData[i] = new BlockData(Vector3Int.zero, BlockType.NOTHING);
 
 			}
 			else {
@@ -313,7 +314,7 @@ using UnityEngine;
 			i++;
 			nPos = pos + new Vector3Int(0, 0, -1);//back
 			if (CheckOutOfBounds(nPos)) {
-				bData[i] = new BlockData(Vector3Int.zero, BlockType.AIR);
+				bData[i] = new BlockData(Vector3Int.zero, BlockType.NOTHING);
 
 			}
 			else {
@@ -322,7 +323,7 @@ using UnityEngine;
 			i++;
 			nPos = pos + new Vector3Int(0, 1, 0);//top
 			if (CheckOutOfBounds(nPos)) {
-				bData[i] = new BlockData(Vector3Int.zero, BlockType.AIR);
+				bData[i] = new BlockData(Vector3Int.zero, BlockType.NOTHING);
 
 			}
 			else {
@@ -331,7 +332,7 @@ using UnityEngine;
 			i++;
 			nPos = pos + new Vector3Int(0, -1, 0);//bot
 			if (CheckOutOfBounds(nPos)) {
-				bData[i] = new BlockData(Vector3Int.zero, BlockType.AIR);
+				bData[i] = new BlockData(Vector3Int.zero, BlockType.NOTHING);
 
 			}
 			else {

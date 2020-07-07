@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using UnityEngine;
 
 public class Chunk {
-
+	public static Material _material;
 	public static int _size;
 	public static int _uSize;
 	GameObject _collider;
@@ -16,8 +16,12 @@ public class Chunk {
 		_solidMesh = new Mesh();
 		_transMesh = new Mesh();
 		_collider = new GameObject("mesh");
+		_collider.AddComponent<MeshFilter>();
+		_collider.AddComponent<MeshRenderer>();
 		_collider.transform.SetParent(tparent);
 		_collider.AddComponent<MeshCollider>();
+		_collider.GetComponent<MeshFilter>().mesh = _solidMesh;
+		_collider.GetComponent<MeshRenderer>().material = _material;
 	}
 	public void RecalculateCollider() {
 		if (_collider == null)
